@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
-
+from rest_framework import generics, status
 from django.http import JsonResponse
-from dummy.models import Dummy
-from dummy.serializers import DummySerializer
+from .models import Dummy, Usuario
+from .serializers import DummySerializer, UsuarioSerializer, LoginSerializer
+from rest_framework.response import Response
 
 class DummyAPI(APIView):
     def get(self, request):
@@ -21,3 +22,28 @@ class ListDummiesAPI(APIView):
         dummies = Dummy.objects.all()
         serializer = DummySerializer(dummies, many=True)
         return JsonResponse(serializer.data, safe=False)
+
+
+class RegistroUsuarioAPI(generics.CreateAPIView):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+
+class LoginAPI(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.validated_data["user"]
+            return Response({
+                "status": "ok",
+                "user": {
+                    "id": user.id,
+                    "nombre_completo": user.nombre_completo,
+                    "apellido": user.apellido,
+                    "email": user.email,
+                }
+            })
+        return Response(
+            {"error": "Email o contraseña incorrecto."},
+            status=status.HTTP_401_UNAUTHORIZED
+        )
