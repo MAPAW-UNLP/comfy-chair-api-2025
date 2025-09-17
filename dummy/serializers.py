@@ -36,7 +36,7 @@ class LoginSerializer(serializers.Serializer):
         email = data.get("email")
         password = data.get("password")
 
-        user = authenticate(username=email, password=password)
+        user = authenticate(request=self.context.get("request"), email=email, password=password)
 
         if not user:
             raise serializers.ValidationError({"error": "Email o contraseña incorrecto."})

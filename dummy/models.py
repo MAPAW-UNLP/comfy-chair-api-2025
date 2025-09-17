@@ -12,8 +12,10 @@ class Usuario(AbstractUser):
     afiliacion = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
 
+    username = None  # Eliminamos el username
+
     USERNAME_FIELD = "email"  #identificador único
-    REQUIRED_FIELDS = ["username", "nombre_completo", "apellido","afiliacion"]
+    REQUIRED_FIELDS = ["nombre_completo", "apellido","afiliacion"]
 
     def __str__(self):
         return f"{self.nombre_completo} {self.apellido} ({self.email})"
