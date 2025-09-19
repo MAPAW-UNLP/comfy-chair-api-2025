@@ -1,9 +1,11 @@
+import jwt
+from datetime import datetime, timedelta
+from django.conf import settings
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from django.http import JsonResponse
 from .models import Dummy, Usuario
 from .serializers import DummySerializer, UsuarioSerializer, LoginSerializer
-from rest_framework.response import Response
 
 class DummyAPI(APIView):
     def get(self, request):
@@ -31,19 +33,42 @@ class RegistroUsuarioAPI(generics.CreateAPIView):
 
 class LoginAPI(APIView):
     def post(self, request):
-        serializer = LoginSerializer(data=request.data)
+        serializer = LoginSerializer(data=request.data, context={"request": request})
         if serializer.is_valid():
             user = serializer.validated_data["user"]
-            return Response({
+
+            payload = {
+                "user_id": user.id,
+                "exp": datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS),
+                "iat": datetime.utcnow()
+            }
+            token = jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+
+            return JsonResponse({
                 "status": "ok",
-                "user": {
-                    "id": user.id,
-                    "nombre_completo": user.nombre_completo,
-                    "apellido": user.apellido,
-                    "email": user.email,
-                }
-            })
-        return Response(
+                "token": token
+            }, status=200)
+
+        return JsonResponse(
             {"error": "Email o contraseña incorrecto."},
-            status=status.HTTP_401_UNAUTHORIZED
+            status=401
         )
+
+class GetUsuarioIdAPI(APIView):
+    def get(self, request):
+        user_id = getattr(request, 'user_id', None)
+        if not user_id:
+            return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+        
+        try:
+            usuario = Usuario.objects.get(id=user_id)
+        except Usuario.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+        
+        return JsonResponse({
+            'id': usuario.id,
+            'nombre_completo': usuario.nombre_completo,
+            'apellido': usuario.apellido,
+            'email': usuario.email,
+            'afiliacion': usuario.afiliacion,
+        }, status=200)
