@@ -41,6 +41,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'dummy',
+    'articles',
+    'users',
+    'chairs',
+    'conferences',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +140,9 @@ SECRET_KEY = 'secret'
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 3600  # Una hora de expiración
 
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
