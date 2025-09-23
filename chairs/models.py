@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from articles.models import Article
+from users.models import User
 
-Usuario = get_user_model()
 
 class Bidding(models.Model):
     INTERESES = (
@@ -11,23 +11,23 @@ class Bidding(models.Model):
         ('no_interesado', 'No Interesado'),
         ('ninguno', 'Ninguno'),
     )
-    revisor = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='bids')
+    revisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')
     articulo = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='bids')
     interes = models.CharField(max_length=20, choices=INTERESES, default='ninguno')
 
     class Meta:
         unique_together = ('revisor', 'articulo')
 
-class AsignacionRevisor(models.Model):
-    revisor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+class AssignmentReview(models.Model):
+    revisor = models.ForeignKey(User, on_delete=models.CASCADE)
     articulo = models.ForeignKey(Article, on_delete=models.CASCADE)
     revisado = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ('revisor', 'articulo')
 
-class Revision(models.Model):
-    revisor = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+class Review(models.Model):
+    revisor = models.ForeignKey(User, on_delete=models.CASCADE)
     articulo = models.ForeignKey(Article, on_delete=models.CASCADE)
     texto = models.TextField()
     puntaje = models.IntegerField(choices=[(i, i) for i in range(-3, 4)])

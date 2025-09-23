@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from users.models import User
+
+# Registramos los modelos para que aparezca en el admin
+admin.site.register(User)
