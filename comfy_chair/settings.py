@@ -40,6 +40,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'dummy',
+    'articles',
+    'users',
+    'chairs',
+    'conferences',
+    'reviews',
 ]
 
 MIDDLEWARE = [
@@ -128,3 +133,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
