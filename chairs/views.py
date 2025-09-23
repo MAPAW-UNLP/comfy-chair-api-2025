@@ -52,7 +52,7 @@ def get_revisores_disponibles(request, articulo_id):
         ids_revisores_con_bid.append(bid.revisor.id)
         data_revisor = {
             'id': bid.revisor.id,
-            'nombre_completo': bid.revisor.nombre_completo,
+            'nombre_completo': bid.revisor.full_name,
             'email': bid.revisor.email,
             'interes': bid.interes
         }
@@ -69,7 +69,7 @@ def get_revisores_disponibles(request, articulo_id):
     for revisor in revisores_sin_bid:
         ninguno.append({
             'id': revisor.id,
-            'nombre_completo': revisor.nombre_completo,
+            'nombre_completo': revisor.get_full_name(),
             'email': revisor.email,
             'interes': 'ninguno'
         })

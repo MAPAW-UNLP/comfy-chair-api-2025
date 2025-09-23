@@ -33,4 +33,4 @@ class Review(models.Model):
     puntaje = models.IntegerField(choices=[(i, i) for i in range(-3, 4)])
 
     def __str__(self):
-        return f"Revisión de {self.revisor.nombre_completo} para '{self.articulo.title}'"
+        return f"Revisión de {self.revisor.full_name} para '{self.articulo.title}'"
