@@ -19,8 +19,12 @@ class Bidding(models.Model):
         unique_together = ('revisor', 'articulo')
 
 class AssignmentReview(models.Model):
-    revisor = models.ForeignKey(User, on_delete=models.CASCADE)
-    articulo = models.ForeignKey(Article, on_delete=models.CASCADE)
+    revisor = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='assignmentreviews'
+    )
+    articulo = models.ForeignKey('articles.Article', on_delete=models.CASCADE)
     revisado = models.BooleanField(default=False)
 
     class Meta:
