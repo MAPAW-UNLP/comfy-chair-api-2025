@@ -8,14 +8,13 @@ class Dummy(models.Model):
 
 class Usuario(AbstractUser):
     nombre_completo = models.CharField(max_length=150)
-    apellido = models.CharField(max_length=100)
     afiliacion = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
 
     username = None  # Eliminamos el username
 
     USERNAME_FIELD = "email"  #identificador único
-    REQUIRED_FIELDS = ["nombre_completo", "apellido","afiliacion"]
+    REQUIRED_FIELDS = ["nombre_completo", "afiliacion"]
 
     def __str__(self):
-        return f"{self.nombre_completo} {self.apellido} ({self.email})"
+        return f"{self.nombre_completo} ({self.email})"

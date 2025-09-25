@@ -46,7 +46,13 @@ class LoginAPI(APIView):
 
             return JsonResponse({
                 "status": "ok",
-                "token": token
+                "token": token,
+                "user": {
+                    "id": user.id,
+                    "email": user.email,
+                    "nombre_completo": user.nombre_completo,
+                    "afiliacion": user.afiliacion,
+                } 
             }, status=200)
 
         return JsonResponse(
@@ -68,7 +74,6 @@ class GetUsuarioIdAPI(APIView):
         return JsonResponse({
             'id': usuario.id,
             'nombre_completo': usuario.nombre_completo,
-            'apellido': usuario.apellido,
             'email': usuario.email,
             'afiliacion': usuario.afiliacion,
         }, status=200)
