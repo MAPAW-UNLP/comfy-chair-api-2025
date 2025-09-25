@@ -1,15 +1,15 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-# Create your models here.
-class Dummy(models.Model):
-    name = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-
 class Usuario(AbstractUser):
+    ROLES = (
+        ("user", "User"),
+        ("admin", "Admin"),
+    )
     nombre_completo = models.CharField(max_length=150)
     afiliacion = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
+    rol = models.CharField(max_length=20, choices=ROLES)
 
     username = None  # Eliminamos el username
 

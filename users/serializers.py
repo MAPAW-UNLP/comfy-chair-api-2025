@@ -1,16 +1,9 @@
-
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
-from dummy.models import Dummy
 from django.contrib.auth.hashers import make_password
 from .models import Usuario
 from django.contrib.auth import authenticate
 
-
-class DummySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dummy
-        fields = ['id', 'name', 'created_at']
 
 class UsuarioSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
@@ -23,9 +16,10 @@ class UsuarioSerializer(serializers.ModelSerializer):
         fields = ["id", "nombre_completo", "afiliacion", "email", "password"]
         extra_kwargs = {"password": {"write_only": True}}
 
-    def create(self, validated_data):
-        # encripta la contraseña
+    def create(self, validated_data, rol=None):
         validated_data["password"] = make_password(validated_data["password"])
+        if rol:
+            validated_data["rol"] = rol  # Asigna el rol según el endpoint
         return super().create(validated_data)
 
 class LoginSerializer(serializers.Serializer):

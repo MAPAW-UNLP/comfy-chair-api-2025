@@ -9,8 +9,8 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
 
         # Rutas que no requieren token
         public_paths = [
-            '/dummy/login/',
-            '/dummy/registro/',
+            '/users/login/',
+            '/users/registro/',
         ]
         if request.path in public_paths:
             return None

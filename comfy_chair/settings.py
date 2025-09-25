@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'dummy',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -51,7 +51,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'dummy.middleware.JWTAuthenticationMiddleware',
+    'users.middleware.JWTAuthenticationMiddleware',
 ]
 
 ROOT_URLCONF = 'comfy_chair.urls'
@@ -130,9 +130,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
 
-AUTH_USER_MODEL = "dummy.Usuario"
+AUTH_USER_MODEL = "users.Usuario"
 
-SECRET_KEY = 'secret' 
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 3600  # Una hora de expiración
 

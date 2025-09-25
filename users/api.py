@@ -4,31 +4,22 @@ from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import Dummy, Usuario
-from .serializers import DummySerializer, UsuarioSerializer, LoginSerializer
-
-class DummyAPI(APIView):
-    def get(self, request):
-        return JsonResponse({'message': 'Dummy endpoint working!'})
-
-class CreateDummyAPI(APIView):
-    def post(self, request):
-        serializer = DummySerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=200)
-        return JsonResponse(serializer.errors, status=400)
-
-class ListDummiesAPI(APIView):
-    def get(self, request):
-        dummies = Dummy.objects.all()
-        serializer = DummySerializer(dummies, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
+from .models import Usuario
+from .serializers import UsuarioSerializer, LoginSerializer
 
 class RegistroUsuarioAPI(generics.CreateAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+
+    def perform_create(self, serializer):
+        serializer.create(self.request.data, rol="user")  
+
+class RegistroAdminAPI(generics.CreateAPIView):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+
+    def perform_create(self, serializer):
+        serializer.create(self.request.data, rol="admin")  
 
 
 class LoginAPI(APIView):
@@ -39,6 +30,7 @@ class LoginAPI(APIView):
 
             payload = {
                 "user_id": user.id,
+                "rol": user.rol,
                 "exp": datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS),
                 "iat": datetime.utcnow()
             }
