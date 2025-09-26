@@ -11,30 +11,30 @@ class Bidding(models.Model):
         ('no_interesado', 'No Interesado'),
         ('ninguno', 'Ninguno'),
     )
-    revisor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')
-    articulo = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='bids')
-    interes = models.CharField(max_length=20, choices=INTERESES, default='ninguno')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bids')
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='bids')
+    interest = models.CharField(max_length=20, choices=INTERESES, default='ninguno')
 
     class Meta:
-        unique_together = ('revisor', 'articulo')
+        unique_together = ('reviewer', 'article')
 
 class AssignmentReview(models.Model):
-    revisor = models.ForeignKey(
+    reviewer = models.ForeignKey(
         'users.User',
         on_delete=models.CASCADE,
         related_name='assignmentreviews'
     )
-    articulo = models.ForeignKey('articles.Article', on_delete=models.CASCADE)
-    revisado = models.BooleanField(default=False)
+    article = models.ForeignKey('articles.Article', on_delete=models.CASCADE)
+    reviewed = models.BooleanField(default=False)
 
     class Meta:
-        unique_together = ('revisor', 'articulo')
+        unique_together = ('reviewer', 'article')
 
 class Review(models.Model):
-    revisor = models.ForeignKey(User, on_delete=models.CASCADE)
-    articulo = models.ForeignKey(Article, on_delete=models.CASCADE)
-    texto = models.TextField()
-    puntaje = models.IntegerField(choices=[(i, i) for i in range(-3, 4)])
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    text = models.TextField()
+    score = models.IntegerField(choices=[(i, i) for i in range(-3, 4)])
 
     def __str__(self):
-        return f"Revisión de {self.revisor.full_name} para '{self.articulo.title}'"
+        return f"Revisión de {self.reviewer.full_name} para '{self.article.title}'"

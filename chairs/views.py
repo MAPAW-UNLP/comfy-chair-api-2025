@@ -14,7 +14,7 @@ Usuario = get_user_model()
 # por ahora pongo un nro fijo random, pero va a depender del modelo Session cuando exista
 
 @api_view(['GET'])
-def get_revisores_disponibles(request, articulo_id):
+def get_available_reviewers(request, article_id):
     """
     Devuelve una lista de revisores disponibles y priorizados para un artículo.
     1. Filtra revisores que no hayan alcanzado su límite de asignaciones.
@@ -24,48 +24,48 @@ def get_revisores_disponibles(request, articulo_id):
        - Si aún no se llega a 3, se añaden los que no opinaron ('ninguno').
        - Finalmente, si es necesario, se recurre a los 'no_interesado'.
     """
-    limite_revisiones = math.ceil(Article.objects.count() * 3 / User.objects.filter(is_reviewer=True).count())
-    articulo = get_object_or_404(Article, pk=articulo_id)
+    limit_reviews = math.ceil(Article.objects.count() * 3 / User.objects.filter(is_reviewer=True).count())
+    article = get_object_or_404(Article, pk=article_id)
 
-    revisores_disponibles_por_carga = User.objects.annotate(
-    num_asignaciones=Count('assignmentreviews')
-        ).filter(num_asignaciones__lt=limite_revisiones)
+    available_reviewers_by_load = User.objects.annotate(
+        num_assignments=Count('assignmentreviews')
+    ).filter(num_assignments__lt=limit_reviews)
 
-    ids_revisores_disponibles = [rev.id for rev in revisores_disponibles_por_carga]
+    ids_available_reviewers = [rev.id for rev in available_reviewers_by_load]
 
     bids = Bidding.objects.filter(
-        articulo=articulo,
-        revisor_id__in=ids_revisores_disponibles
-    ).select_related('revisor')
+        article=article,
+        reviewer_id__in=ids_available_reviewers
+    ).select_related('reviewer')
 
     interesados = []
     quizas = []
     no_interesados = []
     
-    ids_revisores_con_bid = []
+    ids_reviewers_with_bid = []
 
     for bid in bids:
-        ids_revisores_con_bid.append(bid.revisor.id)
-        data_revisor = {
-            'id': bid.revisor.id,
-            'nombre_completo': bid.revisor.full_name,
-            'email': bid.revisor.email,
+        ids_reviewers_with_bid.append(bid.reviewer.id)
+        data_reviewer = {
+            'id': bid.reviewer.id,
+            'nombre_completo': bid.reviewer.full_name,
+            'email': bid.reviewer.email,
             'interes': bid.interes
         }
         if bid.interes == 'interesado':
-            interesados.append(data_revisor)
+            interesados.append(data_reviewer)
         elif bid.interes == 'quizas':
-            quizas.append(data_revisor)
+            quizas.append(data_reviewer)
         elif bid.interes == 'no_interesado':
-            no_interesados.append(data_revisor)
-            
+            no_interesados.append(data_reviewer)
+
     ninguno = []
-    revisores_sin_bid = revisores_disponibles_por_carga.exclude(id__in=ids_revisores_con_bid)
-    for revisor in revisores_sin_bid:
+    revisores_sin_bid = available_reviewers_by_load.exclude(id__in=ids_reviewers_with_bid)
+    for reviewer in revisores_sin_bid:
         ninguno.append({
-            'id': revisor.id,
-            'nombre_completo': revisor.full_name,
-            'email': revisor.email,
+            'id': reviewer.id,
+            'nombre_completo': reviewer.full_name,
+            'email': reviewer.email,
             'interes': 'ninguno'
         })
 
@@ -77,9 +77,8 @@ def get_revisores_disponibles(request, articulo_id):
         lista_final_revisores.extend(quizas)
 
     if len(lista_final_revisores) < 3:
-        lista_final_revisores.extend(no_interesados) 
-           
-    if len(lista_final_revisores) < 3:
         lista_final_revisores.extend(ninguno)
 
+    if len(lista_final_revisores) < 3:
+        lista_final_revisores.extend(no_interesados) 
     return Response(lista_final_revisores)
