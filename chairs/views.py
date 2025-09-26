@@ -50,13 +50,13 @@ def get_available_reviewers(request, article_id):
             'id': bid.reviewer.id,
             'nombre_completo': bid.reviewer.full_name,
             'email': bid.reviewer.email,
-            'interes': bid.interes
+            'interes': bid.interest
         }
-        if bid.interes == 'interesado':
+        if bid.interest == 'interesado':
             interesados.append(data_reviewer)
-        elif bid.interes == 'quizas':
+        elif bid.interest == 'quizas':
             quizas.append(data_reviewer)
-        elif bid.interes == 'no_interesado':
+        elif bid.interest == 'no_interesado':
             no_interesados.append(data_reviewer)
 
     ninguno = []
