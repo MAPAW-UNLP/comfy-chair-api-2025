@@ -16,6 +16,7 @@ class ArticleSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "session_name",
             "main_file_url",
             "status",
             "abstract",
