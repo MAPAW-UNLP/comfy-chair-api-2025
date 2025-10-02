@@ -10,6 +10,7 @@ class Usuario(AbstractUser):
     afiliacion = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     rol = models.CharField(max_length=20, choices=ROLES)
+    deleted = models.BooleanField(default=False)
 
     username = None  # Eliminamos el username
 
