@@ -7,10 +7,14 @@ from jwt import ExpiredSignatureError, InvalidTokenError
 class JWTAuthenticationMiddleware(MiddlewareMixin):
     def process_request(self, request):
 
-        # Rutas que no requieren token
+        # Rutas que no requieren token (with and without trailing slash)
         public_paths = [
             '/users/login/',
+            '/users/login',
             '/users/registro/',
+            '/users/registro',
+            '/users/registro-admin/',
+            '/users/registro-admin',
         ]
         if request.path in public_paths:
             return None
