@@ -29,7 +29,9 @@ class Article(models.Model):
 
     # Relaciones
     authors = models.ManyToManyField(User, related_name='articles')
-    notification_author = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, related_name='notification_article')
+    notification_author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notification_articles'
+)
+
 
     def __str__(self):
         return self.title
