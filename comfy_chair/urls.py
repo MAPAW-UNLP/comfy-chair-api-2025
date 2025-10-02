@@ -23,4 +23,5 @@ urlpatterns = [
     path('dummy/', include('dummy.urls')),
     path('api/', include('users.urls')),
     path('api/', include('articles.urls')),
+    path('api/', include('conference_sessions.urls')),
 ]

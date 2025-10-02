@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'articles',
     'users',
+    'conference_sessions',
     'rest_framework',
     'dummy',
 ]
