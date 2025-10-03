@@ -1,4 +1,5 @@
 from django.db import models
+from conference_sessions.models import Session
 from users.models import User
 
 class Article(models.Model):
@@ -18,7 +19,6 @@ class Article(models.Model):
     ]
 
     title = models.CharField(max_length=200)
-    session_name = models.CharField(max_length=200, default="General")
     main_file_url = models.URLField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='reception')
     article_type = models.CharField(max_length=10, choices=ARTICLE_TYPE_CHOICES)
@@ -29,9 +29,9 @@ class Article(models.Model):
 
     # Relaciones
     authors = models.ManyToManyField(User, related_name='articles')
-    notification_author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notification_articles'
-)
-
+    notification_author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notification_articles')
+    session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='articles', null=True, blank=True)
 
     def __str__(self):
         return self.title
+

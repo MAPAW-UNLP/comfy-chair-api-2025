@@ -1,11 +1,10 @@
 from django.db import models
-from articles.models import Article  # Importamos Article para la relación ManyToMany
+from conferences.models import Conference
 
-class ConferenceSession(models.Model):
-    title = models.CharField(max_length=255)
+class Session(models.Model):
+    title = models.CharField(max_length=200)
     deadline = models.DateTimeField()
-    articles = models.ManyToManyField(Article, related_name='conference_sessions')
-    conference_title = models.CharField(max_length=255, null=True, blank=True)
+    conference = models.ForeignKey(Conference, on_delete=models.CASCADE, related_name='sessions')
 
     def __str__(self):
-        return self.title
+        return f"{self.title} ({self.conference.name})"

@@ -1,7 +1,7 @@
 from rest_framework.routers import DefaultRouter
-from .views import ConferenceSessionViewSet
+from .views import SessionViewSet
 
 router = DefaultRouter()
-router.register(r'conference_sessions', ConferenceSessionViewSet, basename='conference_sessions')
+router.register(r'sessions', SessionViewSet, basename='session')
 
 urlpatterns = router.urls
