@@ -8,7 +8,7 @@ class Conferencia (models.Model):
         ('completo', 'Completo')
     ]
 
-    titulo = models.CharField(max_length=50)
+    titulo = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=300)
     fecha_ini = models.DateField(
         null=False,
@@ -24,7 +24,7 @@ class Conferencia (models.Model):
         choices=VISTA_CHOICES,
         default='completo'
     )
-
+    
     def __str__(self):
         return self.titulo
     
