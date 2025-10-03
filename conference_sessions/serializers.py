@@ -1,16 +1,18 @@
 from rest_framework import serializers
 from .models import Session
-from conferences.serializers import ConferenceSerializer
 from conferences.models import Conference
-
-class ConferenceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Conference
-        fields = ['id', 'name' ]
+from conferences.serializers import ConferenceSerializer
 
 class SessionSerializer(serializers.ModelSerializer):
+    # Para lectura (anidado)
     conference = ConferenceSerializer(read_only=True)
+
+    # Para escritura (id)
+    conference_id = serializers.PrimaryKeyRelatedField(
+        queryset=Conference.objects.all(), source='conference', write_only=True
+    )
 
     class Meta:
         model = Session
-        fields = ['id', 'title', 'deadline', 'conference']
+        fields = ['id', 'title', 'deadline', 'conference', 'conference_id']
+
