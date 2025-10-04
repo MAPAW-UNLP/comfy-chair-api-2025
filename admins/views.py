@@ -8,7 +8,7 @@ from .serializers import ConferenciaSerializer
 from django.utils import timezone
 
 class ConferenciaViewSet(viewsets.ModelViewSet):
-    queryset = Conferencia.objects.all()
+    queryset = Conferencia.objects.all().order_by('-id')
     serializer_class = ConferenciaSerializer
 
     # /api/conferencias/terminadas/  -->  devuelve las conferencias con fecha_fin < fecha_actual
