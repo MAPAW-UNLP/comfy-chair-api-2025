@@ -14,7 +14,7 @@ Usuario = get_user_model()
 # por ahora pongo un nro fijo random, pero va a depender del modelo Session cuando exista
 
 @api_view(['GET'])
-def get_revisores_disponibles(request, articulo_id):
+def get_available_reviewers(request, article_id):
     """
     Devuelve una lista de revisores disponibles y priorizados para un artículo.
     1. Filtra revisores que no hayan alcanzado su límite de asignaciones.
@@ -24,72 +24,61 @@ def get_revisores_disponibles(request, articulo_id):
        - Si aún no se llega a 3, se añaden los que no opinaron ('ninguno').
        - Finalmente, si es necesario, se recurre a los 'no_interesado'.
     """
-    limite_revisiones = math.ceil(Article.objects.count() * 3 / User.objects.filter(is_reviewer=True).count())
-    articulo = get_object_or_404(Article, pk=articulo_id)
+    limit_reviews = math.ceil(Article.objects.count() * 3 / User.objects.filter(is_reviewer=True).count())
+    article = get_object_or_404(Article, pk=article_id)
 
-    # 1. Obtenemos los revisores que aún tienen capacidad para revisar.
-    revisores_disponibles_por_carga = Usuario.objects.annotate(
-        num_asignaciones=Count('assignmentreview')
-    ).filter(num_asignaciones__lt=limite_revisiones)
-    
-    # IDs de los revisores que cumplen el requisito de carga
-    ids_revisores_disponibles = [rev.id for rev in revisores_disponibles_por_carga]
+    available_reviewers_by_load = User.objects.annotate(
+        num_assignments=Count('assignmentreviews')
+    ).filter(num_assignments__lt=limit_reviews)
 
-    # 2. Obtenemos todos los bids del artículo para los revisores disponibles
+    ids_available_reviewers = [rev.id for rev in available_reviewers_by_load]
+
     bids = Bidding.objects.filter(
-        articulo=articulo,
-        revisor_id__in=ids_revisores_disponibles
-    ).select_related('revisor')
+        article=article,
+        reviewer_id__in=ids_available_reviewers
+    ).select_related('reviewer')
 
-    # 3. Clasificamos los revisores en sus respectivas categorías
     interesados = []
     quizas = []
     no_interesados = []
     
-    ids_revisores_con_bid = [] # Para saber quiénes ya opinaron
+    ids_reviewers_with_bid = []
 
     for bid in bids:
-        ids_revisores_con_bid.append(bid.revisor.id)
-        data_revisor = {
-            'id': bid.revisor.id,
-            'nombre_completo': bid.revisor.full_name,
-            'email': bid.revisor.email,
-            'interes': bid.interes
+        ids_reviewers_with_bid.append(bid.reviewer.id)
+        data_reviewer = {
+            'id': bid.reviewer.id,
+            'nombre_completo': bid.reviewer.full_name,
+            'email': bid.reviewer.email,
+            'interes': bid.interest
         }
-        if bid.interes == 'interesado':
-            interesados.append(data_revisor)
-        elif bid.interes == 'quizas':
-            quizas.append(data_revisor)
-        elif bid.interes == 'no_interesado':
-            no_interesados.append(data_revisor)
-            
-    # Identificamos a los que no opinaron (interés 'ninguno' o sin bid)
+        if bid.interest == 'interesado':
+            interesados.append(data_reviewer)
+        elif bid.interest == 'quizas':
+            quizas.append(data_reviewer)
+        elif bid.interest == 'no_interesado':
+            no_interesados.append(data_reviewer)
+
     ninguno = []
-    revisores_sin_bid = revisores_disponibles_por_carga.exclude(id__in=ids_revisores_con_bid)
-    for revisor in revisores_sin_bid:
+    revisores_sin_bid = available_reviewers_by_load.exclude(id__in=ids_reviewers_with_bid)
+    for reviewer in revisores_sin_bid:
         ninguno.append({
-            'id': revisor.id,
-            'nombre_completo': revisor.get_full_name(),
-            'email': revisor.email,
+            'id': reviewer.id,
+            'nombre_completo': reviewer.full_name,
+            'email': reviewer.email,
             'interes': 'ninguno'
         })
 
-    # 4. Construimos la lista final siguiendo la lógica de inclusión por grupos
     lista_final_revisores = []
     
-    # Añadir todos los interesados
     lista_final_revisores.extend(interesados)
     
-    # Si no se llega a 3, añadir todos los 'quizás'
     if len(lista_final_revisores) < 3:
         lista_final_revisores.extend(quizas)
-        
-    # Si aún no se llega a 3, añadir todos los que no indicaron interés
+
     if len(lista_final_revisores) < 3:
         lista_final_revisores.extend(ninguno)
 
-    # Si sigue sin llegarse a 3, añadir todos los 'no interesados'
     if len(lista_final_revisores) < 3:
-        lista_final_revisores.extend(no_interesados)
-
+        lista_final_revisores.extend(no_interesados) 
     return Response(lista_final_revisores)

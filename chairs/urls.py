@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 from .api import *
 
-urlpatterns = [
-    path('articulos/<int:articulo_id>/revisores-disponibles/', views.get_revisores_disponibles, name='revisores_disponibles'),    
+urlpatterns = [ 
     path('new/', CreateAssignmentReviewAPI.as_view(), name='create-assignment-review'),
+    path('articulos/<int:article_id>/revisores-disponibles/', views.get_available_reviewers, name='revisores_disponibles'),
 ]

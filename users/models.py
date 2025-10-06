@@ -6,8 +6,7 @@ class User(models.Model):
     affiliation = models.CharField(_("Afiliación"), max_length=255, blank=True)
     email = models.EmailField(_("Email"), unique=True)
     password = models.CharField(_("Contraseña"), max_length=128)
-
-    # --- Roles del Usuario ---
+    
     is_author = models.BooleanField(default=True)
     is_reviewer = models.BooleanField(default=False)
     is_chair = models.BooleanField(default=False)
