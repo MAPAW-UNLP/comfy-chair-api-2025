@@ -26,6 +26,7 @@ class AssignmentReview(models.Model):
     )
     article = models.ForeignKey('articles.Article', on_delete=models.CASCADE)
     reviewed = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ('reviewer', 'article')
