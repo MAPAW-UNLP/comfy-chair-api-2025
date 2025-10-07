@@ -19,13 +19,13 @@ class Article(models.Model):
     ]
 
     title = models.CharField(max_length=200)
-    main_file_url = models.URLField()
+    main_file = models.FileField(upload_to='articles/')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='reception')
     article_type = models.CharField(max_length=10, choices=ARTICLE_TYPE_CHOICES)
 
     # Campos específicos
     abstract = models.TextField(blank=True, null=True)  # para Regular
-    source_file_url = models.URLField(blank=True, null=True)  # para Poster
+    source_file = models.FileField(upload_to='articles/sources/', blank=True, null=True)  # para Poster
 
     # Relaciones
     authors = models.ManyToManyField(User, related_name='articles')

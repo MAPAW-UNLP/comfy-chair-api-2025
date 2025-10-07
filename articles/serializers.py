@@ -13,13 +13,13 @@ class ArticleSerializer(serializers.ModelSerializer):
 
     # Para escritura
     session_id = serializers.PrimaryKeyRelatedField(
-        queryset=Session.objects.all(), source='session', write_only=True
+        queryset=Session.objects.all(), source='session', write_only=True, required=False, allow_null=True
     )
 
     class Meta:
         model = Article
         fields = [
-            'id', 'title', 'main_file_url', 'status', 'article_type',
-            'abstract', 'source_file_url', 'authors', 'notification_author',
+            'id', 'title', 'main_file', 'status', 'article_type',
+            'abstract', 'source_file', 'authors', 'notification_author',
             'session', 'session_id'
         ]
