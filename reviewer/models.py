@@ -11,14 +11,14 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-#Eliminar despues:
+
 class AssignmentReview(models.Model):
     reviewer = models.ForeignKey(
-        'users.User',
+        'User',
         on_delete=models.CASCADE,
         related_name='assignmentreviews'
     )
-    article = models.ForeignKey('articles.Article', on_delete=models.CASCADE)
+    article = models.ForeignKey('Article', on_delete=models.CASCADE)
     reviewed = models.BooleanField(default=False)
 
     class Meta:
@@ -39,7 +39,8 @@ class User(models.Model):
         return self.email
     
 class Review(models.Model):
-    reviewer = models.ForeignKey('auth.User')
+    #reviewer = models.ForeignKey('auth.User')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     score = models.IntegerField(
         validators=[MinValueValidator(-3), MaxValueValidator(3)]
@@ -47,10 +48,14 @@ class Review(models.Model):
     opinion = models.TextField()
     
 class Bid(models.Model):
-    STATES = ["Interesado", "No Interesado", "Quizás"]
-    
-    reviewer = models.ForeignKey('auth.User')
-    
+    #STATES = ["Interesado", "No Interesado", "Quizás"]
+    STATE_CHOICES = [
+        ("Interesado", "Interesado"),
+        ("No Interesado", "No Interesado"), 
+        ("Quizás", "Quizás"),
+    ]
+    #reviewer = models.ForeignKey('auth.User')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
 
-    choice = models.CharField(max_length=20, choices=STATES, null=True, blank=True)
+    choice = models.CharField(max_length=20, choices=STATE_CHOICES, null=True, blank=True)

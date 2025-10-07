@@ -5,8 +5,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from reviewer.models import Review, Article, Bid, User
-from dummy.serializers import ArticleSerializer, BidSerializer, BidUpdateSerializer
-from reviewer.serializers import ReviewerDetailSerializer
+from reviewer.serializers import ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer
 
 # GET /api/articles
 class ArticleListView(APIView):
@@ -50,7 +49,7 @@ class BiddingUpdateView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# GET /api/bidding?reviewerId=123
+# GET /api/bids?reviewerId=123
 class ReviewerBidsView(APIView):
     def get(self, request):
         reviewer_id = request.GET.get('reviewerId')

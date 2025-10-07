@@ -1,7 +1,6 @@
 
 from rest_framework import serializers
-from dummy.models import Article, Bid
-from reviewer.models import AssignmentReview, Review, User
+from reviewer.models import AssignmentReview, Review, User,Article,Bid
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -53,7 +52,7 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
             'bidding_status',
             'bids',
             'reviews_count',
-            'average_score'
+            
         ]
 
     def get_assigned_articles(self, obj):

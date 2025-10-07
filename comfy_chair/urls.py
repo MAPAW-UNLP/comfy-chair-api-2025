@@ -21,4 +21,6 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dummy/', include('dummy.urls')),
+    #agregue esta linea para las urls de reviewer
+    path('api/', include('reviewer.urls')),
 ]
