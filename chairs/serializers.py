@@ -7,4 +7,4 @@ from chairs.models import AssignmentReview
 class AssignmentReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentReview
-        fields = ['id', 'revisor', 'articulo', 'revisado']
+        fields = ['id', 'reviewer', 'article', 'reviewed']

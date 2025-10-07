@@ -50,7 +50,8 @@ def get_available_reviewers(request, article_id):
             'id': bid.reviewer.id,
             'nombre_completo': bid.reviewer.full_name,
             'email': bid.reviewer.email,
-            'interes': bid.interest
+            'interes': bid.interest,
+            'asignado': AssignmentReview.objects.filter(article=article, reviewer=bid.reviewer, is_active=True).exists(),
         }
         if bid.interest == 'interesado':
             interesados.append(data_reviewer)
@@ -66,7 +67,8 @@ def get_available_reviewers(request, article_id):
             'id': reviewer.id,
             'nombre_completo': reviewer.full_name,
             'email': reviewer.email,
-            'interes': 'ninguno'
+            'interes': 'ninguno',
+            'asignado': AssignmentReview.objects.filter(article=article, reviewer=reviewer, is_active=True).exists(),
         })
 
     lista_final_revisores = []
@@ -80,5 +82,7 @@ def get_available_reviewers(request, article_id):
         lista_final_revisores.extend(ninguno)
 
     if len(lista_final_revisores) < 3:
-        lista_final_revisores.extend(no_interesados) 
+        lista_final_revisores.extend(no_interesados)
+
+    lista_final_revisores = sorted(lista_final_revisores, key=lambda r: not r['asignado'])
     return Response(lista_final_revisores)
