@@ -10,11 +10,23 @@ class ChairsAPI(APIView):
 
 class CreateAssignmentReviewAPI(APIView):
     def post(self, request):
-        serializer = AssignmentReviewSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+        reviewer_id = request.data.get("reviewer")
+        article_id = request.data.get("article")
+
+        if not reviewer_id or not article_id:
+            return JsonResponse(
+                {"error": "Reviewer y Article son requeridos."}, status=400
+            )
+
+        assignment, created = AssignmentReview.objects.update_or_create(
+            reviewer_id=reviewer_id,
+            article_id=article_id,
+            defaults={"is_active": True},
+        )
+
+        serializer = AssignmentReviewSerializer(assignment)
+        return JsonResponse(serializer.data, status=201 if created else 200)
+
 
 class DeleteAssignmentReviewAPI(APIView):
     def delete(self, request, *args, **kwargs):
