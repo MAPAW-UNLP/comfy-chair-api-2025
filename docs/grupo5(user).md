@@ -87,7 +87,7 @@ Posibles errores de JWT
 
 "error": "Authorization header requerido": Este error ocurre cuando no se envió el token en el header Authorization. Todo request a un endpoint protegido debe incluir el header Authorization.
 
-"error": "Formato de token inválido": El token enviado no tiene el formato correcto. El formato esperado es: Authorization: Bearer <token>
+"error": "Formato de token inválido": El token enviado no tiene el formato correcto. El formato esperado es: Authorization: Bearer token
 
 "error": "Token expirado": Indica que el token JWT ha caducado. En este caso, el usuario debe volver a iniciar sesión para obtener un nuevo token válido.
 
