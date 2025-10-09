@@ -8,23 +8,23 @@ class Conferencia (models.Model):
         ('completo', 'Completo')
     ]
 
-    titulo = models.CharField(max_length=50, unique=True)
-    descripcion = models.CharField(max_length=300)
-    fecha_ini = models.DateField(
+    title = models.CharField(max_length=50, unique=True)
+    description = models.CharField(max_length=300)
+    start_date = models.DateField(
         null=False,
         blank=False
     )
-    fecha_fin = models.DateField(
+    end_date = models.DateField(
         null=False,
         blank=False
     )
     # tipo de lectura que 
-    vista = models.CharField(
+    blind_kind = models.CharField(
         max_length=12,
         choices=VISTA_CHOICES,
         default='completo'
     )
     
     def __str__(self):
-        return self.titulo
+        return self.title
     

@@ -11,22 +11,22 @@ class ConferenciaViewSet(viewsets.ModelViewSet):
     queryset = Conferencia.objects.all().order_by('-id')
     serializer_class = ConferenciaSerializer
 
-    # /api/conferencias/terminadas/  -->  devuelve las conferencias con fecha_fin < fecha_actual
+    # /api/conferencias/terminadas/  -->  devuelve las conferencias con end_date < fecha_actual
     @action(detail=False, methods=['get'])
     def terminadas(self, request):
         fecha_actual = timezone.now().date()
         conferencias = Conferencia.objects.filter(
-            fecha_fin__lt=fecha_actual
+            end_date__lt=fecha_actual
         ).order_by('-id')  
         serializer = self.get_serializer(conferencias, many=True)
         return Response(serializer.data)
     
-    # /api/conferencias/activas/ --> devuelve las conferencias con fecha_fin >= fecha_actual
+    # /api/conferencias/activas/ --> devuelve las conferencias con end_date >= fecha_actual
     @action(detail=False, methods=['get'])
     def activas(self, request):
         fecha_actual = timezone.now().date()
         conferencias = Conferencia.objects.filter(
-            fecha_fin__gte=fecha_actual
+            end_date__gte=fecha_actual
         ).order_by('-id') 
         serializer = self.get_serializer(conferencias, many=True)
         return Response(serializer.data)
