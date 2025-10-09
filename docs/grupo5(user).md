@@ -7,9 +7,13 @@ Este módulo se encarga de la gestión de usuarios en la aplicación, incluyendo
 -User
 
 full_name (CharField): Nombre completo del usuario.
+
 affiliation (CharField): Afiliación del usuario.
+
 email (EmailField): Correo electrónico único del usuario. Se utiliza como identificador (USERNAME_FIELD).
+
 role (CharField, choices=["user", "admin"]): Rol del usuario.
+
 deleted (BooleanField): Indica si el usuario está eliminado lógicamente.
 
 
