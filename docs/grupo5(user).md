@@ -4,6 +4,7 @@ Este módulo se encarga de la gestión de usuarios en la aplicación, incluyendo
 
 
 1) Modelos
+
 -User
 
 full_name (CharField): Nombre completo del usuario.
@@ -18,6 +19,7 @@ deleted (BooleanField): Indica si el usuario está eliminado lógicamente.
 
 
 2) Serializers
+
 -UsuarioSerializer
 
 Serializa los datos del usuario (id, full_name, affiliation, email, password).
@@ -34,6 +36,7 @@ Lanza un error si los datos son incorrectos.
 
 
 3) API Endpoints
+
 -Registro de usuario
 
 POST /users/registro/
