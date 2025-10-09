@@ -1,5 +1,5 @@
 from django.db import models
-from conferences.models import Conference
+from conference.models import Conference
 
 class Session(models.Model):
     title = models.CharField(max_length=200)

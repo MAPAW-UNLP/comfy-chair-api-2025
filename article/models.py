@@ -1,6 +1,6 @@
 from django.db import models
-from conference_sessions.models import Session
-from users.models import User
+from conference_session.models import Session
+from user.models import User
 
 class Article(models.Model):
     STATUS_CHOICES = [
@@ -21,15 +21,13 @@ class Article(models.Model):
     title = models.CharField(max_length=200)
     main_file = models.FileField(upload_to='articles/')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='reception')
-    article_type = models.CharField(max_length=10, choices=ARTICLE_TYPE_CHOICES)
-
-    # Campos específicos
-    abstract = models.TextField(blank=True, null=True)  # para Regular
-    source_file = models.FileField(upload_to='articles/sources/', blank=True, null=True)  # para Poster
+    type = models.CharField(max_length=10, choices=ARTICLE_TYPE_CHOICES)
+    abstract = models.TextField(max_lenght=300)
+    source_file = models.FileField(upload_to='articles/sources/', blank=True, null=True)  # Solo para Articulos de Tipo Poster
 
     # Relaciones
     authors = models.ManyToManyField(User, related_name='articles')
-    notification_author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notification_articles')
+    corresponding_author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='notification_articles')
     session = models.ForeignKey(Session, on_delete=models.CASCADE, related_name='articles', null=True, blank=True)
 
     def __str__(self):

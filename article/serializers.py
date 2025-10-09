@@ -1,7 +1,7 @@
 from rest_framework import serializers
-from conference_sessions.models import Session
-from conference_sessions.serializers import SessionSerializer
-from users.models import User
+from conference_session.models import Session
+from conference_session.serializers import SessionSerializer
+from user.models import User
 from .models import Article
 
 class ArticleSerializer(serializers.ModelSerializer):

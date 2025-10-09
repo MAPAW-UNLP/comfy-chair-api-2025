@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Session
-from conferences.models import Conference
-from conferences.serializers import ConferenceSerializer
+from conference.models import Conference
+from conference.serializers import ConferenceSerializer
 
 class SessionSerializer(serializers.ModelSerializer):
     # Para lectura (anidado)

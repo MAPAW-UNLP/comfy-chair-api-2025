@@ -1,6 +1,6 @@
 from rest_framework import viewsets
-from conference_sessions.models import Session
-from conference_sessions.serializers import SessionSerializer
+from conference_session.models import Session
+from conference_session.serializers import SessionSerializer
 
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
