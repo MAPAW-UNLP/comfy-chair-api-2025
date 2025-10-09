@@ -4,22 +4,22 @@ from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework import generics, status
-from .models import Usuario
+from .models import User
 from .serializers import UsuarioSerializer, LoginSerializer
 
 class RegistroUsuarioAPI(generics.CreateAPIView):
-    queryset = Usuario.objects.all()
+    queryset = User.objects.all()
     serializer_class = UsuarioSerializer
 
     def perform_create(self, serializer):
-        serializer.create(self.request.data, rol="user")  
+        serializer.create(self.request.data, role="user")  
 
 class RegistroAdminAPI(generics.CreateAPIView):
-    queryset = Usuario.objects.all()
+    queryset = User.objects.all()
     serializer_class = UsuarioSerializer
 
     def perform_create(self, serializer):
-        serializer.create(self.request.data, rol="admin")  
+        serializer.create(self.request.data, role="admin")  
 
 
 class LoginAPI(APIView):
@@ -30,7 +30,7 @@ class LoginAPI(APIView):
 
             payload = {
                 "user_id": user.id,
-                "rol": user.rol,
+                "rol": user.role,
                 "exp": datetime.utcnow() + timedelta(seconds=settings.JWT_EXP_DELTA_SECONDS),
                 "iat": datetime.utcnow()
             }
@@ -42,8 +42,8 @@ class LoginAPI(APIView):
                 "user": {
                     "id": user.id,
                     "email": user.email,
-                    "nombre_completo": user.nombre_completo,
-                    "afiliacion": user.afiliacion,
+                    "full_name": user.full_name,
+                    "affiliation": user.affiliation,
                 } 
             }, status=200)
 
@@ -59,13 +59,13 @@ class GetUsuarioIdAPI(APIView):
             return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
         
         try:
-            usuario = Usuario.objects.get(id=user_id)
-        except Usuario.DoesNotExist:
+            usuario = User.objects.get(id=user_id)
+        except User.DoesNotExist:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
         
         return JsonResponse({
             'id': usuario.id,
-            'nombre_completo': usuario.nombre_completo,
+            'full_name': usuario.full_name,
             'email': usuario.email,
-            'afiliacion': usuario.afiliacion,
+            'affiliation': usuario.affiliation,
         }, status=200)

@@ -130,7 +130,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
 ]
 
-AUTH_USER_MODEL = "users.Usuario"
+AUTH_USER_MODEL = 'users.User'
 
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 3600  # Una hora de expiración
