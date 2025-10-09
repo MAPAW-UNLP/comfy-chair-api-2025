@@ -4,4 +4,4 @@ from .models import Conference
 class ConferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conference
-        fields = ['id', 'name']
+        fields = ['id', 'title', 'description', 'start_date', 'end_date', 'blind_kind']

@@ -7,14 +7,6 @@ from .serializers import ArticleSerializer
 class ArticleViewSet(viewsets.ModelViewSet):
     queryset = Article.objects.all()
 
-    # print(queryset)
-    '''
-    Nacho: tuve que comentar lo de arriba porque no ejecutaba las migraciones. 
-    Segun ChatGPT: Esa línea se ejecuta en el momento en que Django importa el archivo, 
-    no cuando se hace una petición. Y como en ese momento las migraciones todavía no se corrieron 
-    (o incluso Django las está preparando), intentar acceder a Article.objects.all() provoca el error:
-    '''
-    
     serializer_class = ArticleSerializer
     
     def create(self, request, *args, **kwargs):

@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import Article  # o el nombre de tu clase artículo
+from .models import Article
 
 admin.site.register(Article)

@@ -23,10 +23,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('dummy/', include('dummy.urls')),
-    path('api/', include('users.urls')),
-    path('api/', include('articles.urls')),
-    path('api/', include('conferences.urls')),
-    path('api/', include('conference_sessions.urls')),
+    path('api/', include('user.urls')),
+    path('api/', include('article.urls')),
+    path('api/', include('conference.urls')),
+    path('api/', include('conference_session.urls')),
 ]
 
 # Serve media files in development

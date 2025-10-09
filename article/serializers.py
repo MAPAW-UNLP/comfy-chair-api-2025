@@ -19,7 +19,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
         fields = [
-            'id', 'title', 'main_file', 'status', 'article_type',
-            'abstract', 'source_file', 'authors', 'notification_author',
+            'id', 'title', 'main_file', 'status', 'type',
+            'abstract', 'source_file', 'authors', 'corresponding_author',
             'session', 'session_id'
         ]
