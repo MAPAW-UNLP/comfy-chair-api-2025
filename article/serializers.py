@@ -6,7 +6,7 @@ from .models import Article
 
 class ArticleSerializer(serializers.ModelSerializer):
     authors = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True)
-    notification_author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    corresponding_author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     # Para lectura
     session = SessionSerializer(read_only=True)
