@@ -11,32 +11,14 @@ from users.models import *
 
 Usuario = get_user_model()
 
-# por ahora pongo un nro fijo random, pero va a depender del modelo Session cuando exista
-
 @api_view(['GET'])
 def get_available_reviewers(request, article_id):
     """
-    Devuelve una lista de revisores disponibles y priorizados para un artículo.
-    1. Filtra revisores que no hayan alcanzado su límite de asignaciones.
-    2. Ordena los candidatos según el interés:
-       - Primero, todos los 'interesados'.
-       - Si no se llega a 3, se añaden todos los 'quizas'.
-       - Si aún no se llega a 3, se añaden los que no opinaron ('ninguno').
-       - Finalmente, si es necesario, se recurre a los 'no_interesado'.
+    Devuelve todos los revisores disponibles y asignados, priorizados según el interés.
     """
-    limit_reviews = math.ceil(Article.objects.count() * 3 / User.objects.filter(is_reviewer=True).count())
     article = get_object_or_404(Article, pk=article_id)
 
-    available_reviewers_by_load = User.objects.annotate(
-        num_assignments=Count('assignmentreviews')
-    ).filter(num_assignments__lt=limit_reviews)
-
-    ids_available_reviewers = [rev.id for rev in available_reviewers_by_load]
-
-    bids = Bidding.objects.filter(
-        article=article,
-        reviewer_id__in=ids_available_reviewers
-    ).select_related('reviewer')
+    bids = Bidding.objects.filter(article=article).select_related('reviewer')
 
     interesados = []
     quizas = []
@@ -60,29 +42,24 @@ def get_available_reviewers(request, article_id):
         elif bid.interest == 'no_interesado':
             no_interesados.append(data_reviewer)
 
-    ninguno = []
-    revisores_sin_bid = available_reviewers_by_load.exclude(id__in=ids_reviewers_with_bid)
-    for reviewer in revisores_sin_bid:
-        ninguno.append({
+    revisores_sin_bid = User.objects.filter(is_reviewer=True).exclude(id__in=ids_reviewers_with_bid)
+    ninguno = [
+        {
             'id': reviewer.id,
             'nombre_completo': reviewer.full_name,
             'email': reviewer.email,
             'interes': 'ninguno',
             'asignado': AssignmentReview.objects.filter(article=article, reviewer=reviewer, is_active=True).exists(),
-        })
+        }
+        for reviewer in revisores_sin_bid
+    ]
 
     lista_final_revisores = []
-    
     lista_final_revisores.extend(interesados)
-    
-    if len(lista_final_revisores) < 3:
-        lista_final_revisores.extend(quizas)
-
-    if len(lista_final_revisores) < 3:
-        lista_final_revisores.extend(ninguno)
-
-    if len(lista_final_revisores) < 3:
-        lista_final_revisores.extend(no_interesados)
+    lista_final_revisores.extend(quizas)
+    lista_final_revisores.extend(ninguno)
+    lista_final_revisores.extend(no_interesados)
 
     lista_final_revisores = sorted(lista_final_revisores, key=lambda r: not r['asignado'])
+
     return Response(lista_final_revisores)
