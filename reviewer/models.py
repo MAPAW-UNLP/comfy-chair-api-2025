@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -48,14 +47,18 @@ class Review(models.Model):
     opinion = models.TextField()
     
 class Bid(models.Model):
-    #STATES = ["Interesado", "No Interesado", "Quizás"]
     STATE_CHOICES = [
         ("Interesado", "Interesado"),
         ("No Interesado", "No Interesado"), 
         ("Quizás", "Quizás"),
+        ("No_select", "No seleccionado"),  # <-- Agrega la etiqueta legible
     ]
-    #reviewer = models.ForeignKey('auth.User')
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
-
-    choice = models.CharField(max_length=20, choices=STATE_CHOICES, null=True, blank=True)
+    choice = models.CharField(
+        max_length=20,
+        choices=STATE_CHOICES,
+        default="No_select",
+        null=True,
+        blank=True
+    )
