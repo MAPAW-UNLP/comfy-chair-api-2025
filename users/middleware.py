@@ -11,8 +11,8 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         public_paths = [
             '/users/login/',
             '/users/login',
-            #'/users/registro/',
-            #'/users/registro',
+            '/users/registro/',
+            '/users/registro',
             '/users/registro-admin/',
             '/users/registro-admin',
         ]
