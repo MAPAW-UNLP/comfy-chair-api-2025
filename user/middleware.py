@@ -9,12 +9,12 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
 
         # Rutas que no requieren token (with and without trailing slash)
         public_paths = [
-            '/users/login/',
-            '/users/login',
-            '/users/registro/',
-            '/users/registro',
-            '/users/registro-admin/',
-            '/users/registro-admin',
+            '/user/login/',
+            '/user/login',
+            '/user/registro/',
+            '/user/registro',
+            '/user/registro-admin/',
+            '/user/registro-admin',
         ]
         if request.path in public_paths:
             return None

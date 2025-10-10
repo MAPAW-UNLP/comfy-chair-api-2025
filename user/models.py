@@ -19,3 +19,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.affiliation} ({self.email})"
+
+    class Meta:
+        verbose_name_plural = "user"

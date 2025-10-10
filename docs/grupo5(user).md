@@ -39,7 +39,7 @@ Lanza un error si los datos son incorrectos.
 
 -Registro de usuario
 
-POST /users/registro/
+POST /user/registro/
 
 Registra un usuario con rol user.
 Parámetros: full_name, affiliation, email, password.
@@ -47,7 +47,7 @@ Parámetros: full_name, affiliation, email, password.
 
 -Registro de administrador
 
-POST /users/registro-admin/
+POST /user/registro-admin/
 
 Registra un usuario con rol admin.
 Parámetros: full_name, affiliation, email, password.
@@ -55,7 +55,7 @@ Parámetros: full_name, affiliation, email, password.
 
 -Login
 
-POST /users/login/
+POST /user/login/
 
 Autentica un usuario y retorna el usuario y un token JWT.
 El JWT incluye user_id y role en su payload.
@@ -64,7 +64,7 @@ Parámetros: email, password.
 
 -Obtener información del usuario actual
 
-GET /users/getUsuario/
+GET /user/getUsuario/
 
 Requiere token JWT válido en el header Authorization: Bearer <token>.
 Retorna los datos del usuario autenticado.
