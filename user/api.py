@@ -69,3 +69,18 @@ class GetUsuarioIdAPI(APIView):
             'email': usuario.email,
             'affiliation': usuario.affiliation,
         }, status=200)
+    
+# Creado por el Grupo 1 para traer todos los usuarios de la base de datos
+# Se requiere para poder seleccionar los autores de un articulo
+# No esta protegido por JWT pero deberia estarlo de alguna forma, se deja asi para facilitar el merge
+class GetUsuariosAPI(APIView):
+    def get(self, request):
+        usuarios = User.objects.all()
+        usuarios_data = [
+            {
+                'id': usuario.id,
+                'full_name': usuario.full_name,
+                'email': usuario.email,
+            } for usuario in usuarios
+        ]
+        return JsonResponse(usuarios_data, safe=False, status=200)
