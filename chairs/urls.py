@@ -1,9 +1,12 @@
 from django.urls import path
-from . import views
-from .api import *
+from .api import (
+    CreateReviewAssignmentAPI,
+    DeleteReviewAssignmentAPI,
+    AvailableReviewersAPI,
+)
 
-urlpatterns = [ 
-    path('new/', CreateAssignmentReviewAPI.as_view(), name='create-assignment-review'),
-    path('reviews/<int:reviewer_id>/<int:article_id>/delete/', DeleteAssignmentReviewAPI.as_view(), name='delete-assignment-review'),
-    path('articulos/<int:article_id>/revisores-disponibles/', views.get_available_reviewers, name='revisores_disponibles'),
+urlpatterns = [
+    path('new/', CreateReviewAssignmentAPI.as_view(), name='create-review-assignment'),
+    path('reviews/<int:reviewer_id>/<int:article_id>/delete/', DeleteReviewAssignmentAPI.as_view(), name='delete-review-assignment'),
+    path('articles/<int:article_id>/available-reviewers/', AvailableReviewersAPI.as_view(), name='available-reviewers'),
 ]
