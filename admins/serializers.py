@@ -1,16 +1,16 @@
 from rest_framework import serializers
-from admins.models import Conferencia
+from admins.models import Conference
 from datetime import date
 
 class ConferenciaSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Conferencia
+        model = Conference
         fields = '__all__'
 
     def validate_title(self, value):
         # para el caso de guarda la edición se puede repetir el nombre
         conferencia_id = self.instance.id if self.instance else None
-        if Conferencia.objects.filter(title=value).exclude(id=conferencia_id).exists():
+        if Conference.objects.filter(title=value).exclude(id=conferencia_id).exists():
             raise serializers.ValidationError("Ya existe una conferencia con este nombre.")
         return value
     

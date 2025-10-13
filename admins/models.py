@@ -1,6 +1,6 @@
 from django.db import models
 
-class Conferencia (models.Model):
+class Conference (models.Model):
 
     VISTA_CHOICES = [
         ('single blind', 'Single blind'),
@@ -18,7 +18,7 @@ class Conferencia (models.Model):
         null=False,
         blank=False
     )
-    # tipo de lectura que 
+    # tipo de lectura 
     blind_kind = models.CharField(
         max_length=12,
         choices=VISTA_CHOICES,
