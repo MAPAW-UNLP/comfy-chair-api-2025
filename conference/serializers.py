@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from admins.models import Conference
+from conference.models import Conference
 from datetime import date
 
 class ConferenciaSerializer(serializers.ModelSerializer):

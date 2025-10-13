@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'dummy',
-    'admins',
+    #'dummy',
+    'conference',
     'user',
 ]
 
@@ -53,8 +53,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'user.middleware.JWTAuthenticationMiddleware',
 ]
+
+# Incluir JWTAuthenticationMiddleware solo fuera de DEBUG (producción)
+if not DEBUG:
+    MIDDLEWARE.append('user.middleware.JWTAuthenticationMiddleware')
 
 ROOT_URLCONF = 'comfy_chair.urls'
 
@@ -136,4 +139,3 @@ AUTH_USER_MODEL = 'user.User'
 
 JWT_ALGORITHM = 'HS256'
 JWT_EXP_DELTA_SECONDS = 3600  # Una hora de expiración
-
