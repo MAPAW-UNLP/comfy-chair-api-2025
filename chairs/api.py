@@ -1,12 +1,10 @@
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.db.models import Count
 from chairs.models import ReviewAssignment, Bid
 from chairs.serializers import ReviewAssignmentSerializer
 from articles.models import Article
 from users.models import User
-import math
 
 
 class ChairsAPI(APIView):
@@ -59,29 +57,17 @@ class DeleteReviewAssignmentAPI(APIView):
 
 class AvailableReviewersAPI(APIView):
     """
-    Devuelve una lista de revisores disponibles y priorizados para un artículo.
-    1. Filtra revisores que no hayan alcanzado su límite de asignaciones.
-    2. Ordena los candidatos según el interés.
+    Devuelve todos los revisores disponibles y asignados, priorizados según el interés.
     """
 
     def get(self, request, article_id):
-        limit_reviews = math.ceil(
-            Article.objects.count() * 3 / User.objects.filter(is_reviewer=True).count()
-        )
         article = get_object_or_404(Article, pk=article_id)
 
-        available_reviewers_by_load = User.objects.annotate(
-            num_assignments=Count('assignment_reviews')
-        ).filter(num_assignments__lt=limit_reviews)
+        bids = Bid.objects.filter(article=article).select_related('reviewer')
 
-        ids_available_reviewers = [rev.id for rev in available_reviewers_by_load]
-
-        bids = Bid.objects.filter(
-            article=article,
-            reviewer_id__in=ids_available_reviewers
-        ).select_related('reviewer')
-
-        interested, maybe, not_interested = [], [], []
+        interested = []
+        maybe = []
+        not_interested = []
         reviewers_with_bid_ids = []
 
         for bid in bids:
@@ -104,10 +90,9 @@ class AvailableReviewersAPI(APIView):
             elif bid.interest == 'not_interested':
                 not_interested.append(reviewer_data)
 
-        none_interest = []
-        reviewers_without_bid = available_reviewers_by_load.exclude(id__in=reviewers_with_bid_ids)
-        for reviewer in reviewers_without_bid:
-            none_interest.append({
+        reviewers_without_bid = User.objects.filter(is_reviewer=True).exclude(id__in=reviewers_with_bid_ids)
+        none_interest = [
+            {
                 'id': reviewer.id,
                 'full_name': reviewer.full_name,
                 'email': reviewer.email,
@@ -117,17 +102,17 @@ class AvailableReviewersAPI(APIView):
                     reviewer=reviewer,
                     is_active=True
                 ).exists(),
-            })
+            }
+            for reviewer in reviewers_without_bid
+        ]
 
         final_reviewer_list = []
         final_reviewer_list.extend(interested)
-        if len(final_reviewer_list) < 3:
-            final_reviewer_list.extend(maybe)
-        if len(final_reviewer_list) < 3:
-            final_reviewer_list.extend(none_interest)
-        if len(final_reviewer_list) < 3:
-            final_reviewer_list.extend(not_interested)
+        final_reviewer_list.extend(maybe)
+        final_reviewer_list.extend(none_interest)
+        final_reviewer_list.extend(not_interested)
 
         # Ordena los revisores priorizando los no asignados
         final_reviewer_list = sorted(final_reviewer_list, key=lambda r: not r['assigned'])
+
         return JsonResponse(final_reviewer_list, safe=False)
