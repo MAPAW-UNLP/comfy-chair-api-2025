@@ -1,11 +1,30 @@
-from django.db import models 
+from django.db import models
 
-class Conference(models.Model): 
-    title = models.CharField(max_length=200) 
+class Conference (models.Model):
+
+    VISTA_CHOICES = [
+        ('single blind', 'Single blind'),
+        ('double blind', 'Double blind'),
+        ('completo', 'Completo')
+    ]
+
+    title = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=300)
-    start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
-    blind_kind = models.BooleanField(default=False)
-
-    def __str__(self): 
+    start_date = models.DateField(
+        null=False,
+        blank=False
+    )
+    end_date = models.DateField(
+        null=False,
+        blank=False
+    )
+    # tipo de lectura 
+    blind_kind = models.CharField(
+        max_length=12,
+        choices=VISTA_CHOICES,
+        default='completo'
+    )
+    
+    def __str__(self):
         return self.title
+    
