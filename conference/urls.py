@@ -1,11 +1,7 @@
-from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import ConferenciaViewSet
+from .views import ConferenceViewSet
 
 router = DefaultRouter()
-router.register(r'', ConferenciaViewSet)
+router.register(r'conference', ConferenceViewSet, basename='conference')
 
-urlpatterns = [
-    path('', include(router.urls))
-]
-
+urlpatterns = router.urls

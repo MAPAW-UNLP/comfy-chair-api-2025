@@ -1,3 +1,4 @@
 from django.contrib import admin
+from .models import User  # o el nombre de tu clase de usuario
 
-# Register your models here.
+admin.site.register(User)

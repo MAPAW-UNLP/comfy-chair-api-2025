@@ -4,13 +4,11 @@ from django.contrib.auth.hashers import make_password
 from .models import User
 from django.contrib.auth import authenticate
 
-
-class UsuarioSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(
         required=True,
         validators=[UniqueValidator(queryset=User.objects.all(), message="Email ya registrado.")]
     )
-  
 
     class Meta:
         model = User

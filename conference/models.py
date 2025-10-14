@@ -7,7 +7,7 @@ class Conference (models.Model):
         ('double blind', 'Double blind'),
         ('completo', 'Completo')
     ]
-
+    
     title = models.CharField(max_length=50, unique=True)
     description = models.CharField(max_length=300)
     start_date = models.DateField(
@@ -27,4 +27,3 @@ class Conference (models.Model):
     
     def __str__(self):
         return self.title
-    

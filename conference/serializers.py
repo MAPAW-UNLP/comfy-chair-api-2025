@@ -1,8 +1,13 @@
 from rest_framework import serializers
-from conference.models import Conference
+from .models import Conference
 from datetime import date
 
-class ConferenciaSerializer(serializers.ModelSerializer):
+class ConferenceSerializerGrupo1(serializers.ModelSerializer):
+    class Meta:
+        model = Conference
+        fields = ['id', 'title', 'description', 'start_date', 'end_date', 'blind_kind']
+
+class ConferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conference
         fields = '__all__'

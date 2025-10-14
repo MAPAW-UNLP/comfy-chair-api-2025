@@ -11,10 +11,10 @@ class JWTAuthenticationMiddleware(MiddlewareMixin):
         public_paths = [
             '/user/login/',
             '/user/login',
-            '/user/registro/',
-            '/user/registro',
-            '/user/registro-admin/',
-            '/user/registro-admin',
+            '/user/register/',
+            '/user/register',
+            '/user/register-admin/',
+            '/user/register-admin',
         ]
         if request.path in public_paths:
             return None

@@ -2,7 +2,6 @@ Documentación grupo5 usuarios (users)
 
 Este módulo se encarga de la gestión de usuarios en la aplicación, incluyendo el registro, autenticación y recuperación de información de usuarios. Implementa autenticación JWT y soporte para roles de usuario (user y admin).
 
-
 1) Modelos
 
 -User
@@ -17,16 +16,14 @@ role (CharField, choices=["user", "admin"]): Rol del usuario.
 
 deleted (BooleanField): Indica si el usuario está eliminado lógicamente.
 
-
 2) Serializers
 
--UsuarioSerializer
+-UserSerializer
 
 Serializa los datos del usuario (id, full_name, affiliation, email, password).
 La contraseña se guarda encriptada usando make_password.
 Permite asignar un rol automáticamente desde la vista usando el parámetro role.
 password es write-only y no se retorna en las respuestas.
-
 
 -LoginSerializer
 
@@ -34,24 +31,21 @@ Valida el correo y la contraseña del usuario.
 Devuelve el objeto user y un token si la autenticación es exitosa.
 Lanza un error si los datos son incorrectos.
 
-
 3) API Endpoints
 
 -Registro de usuario
 
-POST /user/registro/
+POST /user/register/
 
 Registra un usuario con rol user.
 Parámetros: full_name, affiliation, email, password.
 
-
 -Registro de administrador
 
-POST /user/registro-admin/
+POST /user/register-admin/
 
 Registra un usuario con rol admin.
 Parámetros: full_name, affiliation, email, password.
-
 
 -Login
 
@@ -61,14 +55,18 @@ Autentica un usuario y retorna el usuario y un token JWT.
 El JWT incluye user_id y role en su payload.
 Parámetros: email, password.
 
-
 -Obtener información del usuario actual
 
-GET /user/getUsuario/
+GET /user/getUser/
 
 Requiere token JWT válido en el header Authorization: Bearer <token>.
 Retorna los datos del usuario autenticado.
 
+GET /user/getUsers/
+
+No requiere token, creado por el grupo 1 para poder traer todos los usuarios.
+Requerido en el componente del front "ArticleForm". Queda pendiente hacerlo mas seguro.
+Retorna una lista con todos los usuarios de la base de datos.
 
 4) Middleware
 
@@ -76,12 +74,11 @@ Retorna los datos del usuario autenticado.
 
 Intercepta todas las peticiones y valida el JWT en el header Authorization.
 
-Rutas públicas: /users/login/, /users/registro/, /users/registro-admin/.
+Rutas públicas: /user/login/, /user/register/, /user/register-admin/.
 
 Valida formato y expiración del token.
 Agrega request.user_id si el token es válido.
 Devuelve error 401 si el token es inválido, faltante o expirado.
-
 
 Posibles errores de JWT
 
