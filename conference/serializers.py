@@ -7,7 +7,6 @@ class ConferenceSerializerGrupo1(serializers.ModelSerializer):
         model = Conference
         fields = ['id', 'title', 'description', 'start_date', 'end_date', 'blind_kind']
 
-
 class ConferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Conference

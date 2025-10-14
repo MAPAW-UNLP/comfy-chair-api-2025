@@ -5,22 +5,21 @@ from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework import generics, status
 from .models import User
-from .serializers import UsuarioSerializer, LoginSerializer
+from .serializers import UserSerializer, LoginSerializer
 
-class RegistroUsuarioAPI(generics.CreateAPIView):
+class UserRegisterAPI(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UsuarioSerializer
+    serializer_class = UserSerializer
 
     def perform_create(self, serializer):
         serializer.create(self.request.data, role="user")  
 
-class RegistroAdminAPI(generics.CreateAPIView):
+class AdminRegisterAPI(generics.CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UsuarioSerializer
+    serializer_class = UserSerializer
 
     def perform_create(self, serializer):
         serializer.create(self.request.data, role="admin")  
-
 
 class LoginAPI(APIView):
     def post(self, request):
@@ -52,7 +51,7 @@ class LoginAPI(APIView):
             status=401
         )
 
-class GetUsuarioIdAPI(APIView):
+class GetUserIdAPI(APIView):
     def get(self, request):
         user_id = getattr(request, 'user_id', None)
         if not user_id:
@@ -73,7 +72,7 @@ class GetUsuarioIdAPI(APIView):
 # Creado por el Grupo 1 para traer todos los usuarios de la base de datos
 # Se requiere para poder seleccionar los autores de un articulo
 # No esta protegido por JWT pero deberia estarlo de alguna forma, se deja asi para facilitar el merge
-class GetUsuariosAPI(APIView):
+class GetUserListAPI(APIView):
     def get(self, request):
         usuarios = User.objects.all()
         usuarios_data = [
