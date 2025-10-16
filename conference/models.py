@@ -1,4 +1,5 @@
 from django.db import models
+from user.models import User
 
 class Conference (models.Model):
 
@@ -23,6 +24,13 @@ class Conference (models.Model):
         max_length=12,
         choices=VISTA_CHOICES,
         default='completo'
+    )
+
+    # lista de chairs
+    chairs = models.ManyToManyField(
+        User,
+        blank=True,
+        related_name='conferences'
     )
     
     def __str__(self):
