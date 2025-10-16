@@ -6,11 +6,11 @@ from user.models import User
 
 class AssignmentReview(models.Model):
     reviewer = models.ForeignKey(
-        'User',
+        'user.User',  # <-- referencia correcta
         on_delete=models.CASCADE,
         related_name='assignmentreviews'
     )
-    article = models.ForeignKey('Article', on_delete=models.CASCADE)
+    article = models.ForeignKey('article.Article', on_delete=models.CASCADE)  # <-- referencia correcta
     reviewed = models.BooleanField(default=False)
 
     class Meta:
