@@ -1,15 +1,8 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
-
-# Create your models here.
-class Article(models.Model):
-    id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-
-    def __str__(self):
-        return self.title
+from article.models import Article
+from user.models import User
 
 class AssignmentReview(models.Model):
     reviewer = models.ForeignKey(
@@ -22,20 +15,6 @@ class AssignmentReview(models.Model):
 
     class Meta:
         unique_together = ('reviewer', 'article')
-
-class User(models.Model):
-    full_name = models.CharField(_("Nombre Completo"), max_length=255)
-    affiliation = models.CharField(_("Afiliación"), max_length=255, blank=True)
-    email = models.EmailField(_("Email"), unique=True)
-    password = models.CharField(_("Contraseña"), max_length=128)
-    
-    is_author = models.BooleanField(default=True)
-    is_reviewer = models.BooleanField(default=False)
-    is_chair = models.BooleanField(default=False)
-    
-
-    def __str__(self):
-        return self.email
     
 class Review(models.Model):
     #reviewer = models.ForeignKey('auth.User')

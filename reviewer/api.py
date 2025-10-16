@@ -7,25 +7,25 @@ from django.http import JsonResponse
 from reviewer.models import Review, Article, Bid, User
 from reviewer.serializers import ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer
 
-# GET /api/articles
-class ArticleListView(APIView):
-    def get(self, request):
-        articles = Article.objects.all()
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
+# # GET /api/articles
+# class ArticleListView(APIView):
+#     def get(self, request):
+#         articles = Article.objects.all()
+#         serializer = ArticleSerializer(articles, many=True)
+#         return Response(serializer.data)
 
-# GET /api/articles/{id}
-class ArticleDetailView(APIView):
-    def get_object(self, pk):
-        try:
-            return Article.objects.get(pk=pk)
-        except Article.DoesNotExist:
-            raise Http404
+# # GET /api/articles/{id}
+# class ArticleDetailView(APIView):
+#     def get_object(self, pk):
+#         try:
+#             return Article.objects.get(pk=pk)
+#         except Article.DoesNotExist:
+#             raise Http404
 
-    def get(self, request, pk):
-        article = self.get_object(pk)
-        serializer = ArticleSerializer(article)
-        return Response(serializer.data)
+#     def get(self, request, pk):
+#         article = self.get_object(pk)
+#         serializer = ArticleSerializer(article)
+#         return Response(serializer.data)
 
 # POST /api/bidding
 class BiddingView(APIView):
