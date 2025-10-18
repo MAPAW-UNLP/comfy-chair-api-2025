@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from chairs.models import ReviewAssignment, Bid
+from chairs.models import ReviewAssignment 
+from reviewer.models import Bid
 from chairs.serializers import ReviewAssignmentSerializer
 from articles.models import Article
 from users.models import User
@@ -26,7 +27,7 @@ class CreateReviewAssignmentAPI(APIView):
         assignment, created = ReviewAssignment.objects.update_or_create(
             reviewer_id=reviewer_id,
             article_id=article_id,
-            defaults={"is_active": True},
+            defaults={"deleted": False},
         )
 
         serializer = ReviewAssignmentSerializer(assignment)
@@ -45,12 +46,12 @@ class DeleteReviewAssignmentAPI(APIView):
             review = ReviewAssignment.objects.get(
                 reviewer_id=reviewer_id,
                 article_id=article_id,
-                is_active=True
+                deleted=False
             )
         except ReviewAssignment.DoesNotExist:
             return JsonResponse({'error': 'Reviewer not assigned or already inactive'}, status=404)
 
-        review.is_active = False
+        review.deleted = True
         review.save()
         return JsonResponse({'message': 'Reviewer assignment logically deleted'}, status=200)
 
@@ -80,7 +81,7 @@ class AvailableReviewersAPI(APIView):
                 'assigned': ReviewAssignment.objects.filter(
                     article=article,
                     reviewer=bid.reviewer,
-                    is_active=True
+                    deleted=False
                 ).exists(),
             }
             if bid.interest == 'interested':
@@ -100,7 +101,7 @@ class AvailableReviewersAPI(APIView):
                 'assigned': ReviewAssignment.objects.filter(
                     article=article,
                     reviewer=reviewer,
-                    is_active=True
+                    deleted=False
                 ).exists(),
             }
             for reviewer in reviewers_without_bid

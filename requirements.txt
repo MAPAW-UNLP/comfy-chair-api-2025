@@ -4,4 +4,4 @@ django-cors-headers==4.7.0
 djangorestframework==3.16.1
 PyJWT==2.10.1
 sqlparse==0.5.3
-PyJWT==2.6.0
+tzdata==2025.2
