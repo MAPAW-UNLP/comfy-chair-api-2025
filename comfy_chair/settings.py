@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'article',
+    'chairs',
     'user',
     'conference',
     'conference_session',

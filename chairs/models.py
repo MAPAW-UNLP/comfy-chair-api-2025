@@ -1,15 +1,15 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from articles.models import Article
-from users.models import User
+from article.models import Article
+from user.models import User
 
 class ReviewAssignment(models.Model):
     reviewer = models.ForeignKey(
-        'users.User',
+        'user.User',
         on_delete=models.CASCADE,
         related_name='assignment_reviews'
     )
-    article = models.ForeignKey('articles.Article', on_delete=models.CASCADE)
+    article = models.ForeignKey('article.Article', on_delete=models.CASCADE)
     reviewed = models.BooleanField(default=False)
     deleted = models.BooleanField(default=False)
 

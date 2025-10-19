@@ -4,8 +4,8 @@ from django.shortcuts import get_object_or_404
 from chairs.models import ReviewAssignment 
 from reviewer.models import Bid
 from chairs.serializers import ReviewAssignmentSerializer
-from articles.models import Article
-from users.models import User
+from article.models import Article
+from user.models import User
 
 
 class ChairsAPI(APIView):

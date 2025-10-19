@@ -1,14 +1,4 @@
 from rest_framework import serializers
-<<<<<<< HEAD:dummy/serializers.py
-
-from dummy.models import Dummy
-
-
-class DummySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Dummy
-        fields = ['id', 'name', 'created_at']
-=======
 from rest_framework.validators import UniqueValidator
 from django.contrib.auth.hashers import make_password
 from .models import User
@@ -46,4 +36,3 @@ class LoginSerializer(serializers.Serializer):
 
         data["user"] = user
         return data
->>>>>>> origin/main:user/serializers.py
