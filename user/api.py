@@ -6,6 +6,9 @@ from rest_framework.views import APIView
 from rest_framework import generics, status
 from .models import User
 from .serializers import UserSerializer, LoginSerializer
+from article.models import Article
+from reviewer.models import Review, AssignmentReview, Bid
+from django.db.models import OuterRef, Subquery
 
 class UserRegisterAPI(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -83,3 +86,51 @@ class GetUserListAPI(APIView):
             } for usuario in usuarios
         ]
         return JsonResponse(usuarios_data, safe=False, status=200)
+
+
+class GetUserFullDataAPI(APIView):
+    def get(self, request):
+        user_id = getattr(request, 'user_id', None)
+        if not user_id:
+            return JsonResponse({'error': 'Usuario no autenticado'}, status=401)
+
+        try:
+            usuario = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+        # Artículos donde es autor o autor correspondiente
+        authored_articles = list(
+            Article.objects.filter(authors=usuario).values('id', 'title', 'status', 'type')
+        )
+
+        # Subquery para traer score y opinion si ya existe revisión
+        reviews_subquery = Review.objects.filter(
+            reviewer=usuario,
+            article=OuterRef('article')
+        ).values('score', 'opinion')[:1]
+
+        # Lista de artículos asignados o ya revisados
+        assignments = AssignmentReview.objects.filter(reviewer=usuario).annotate(
+            score=Subquery(reviews_subquery.values('score')),
+            opinion=Subquery(reviews_subquery.values('opinion'))
+        ).values('id', 'reviewed', 'article__title', 'score', 'opinion')
+
+        # Bids enviados
+        bids = list(
+            Bid.objects.filter(reviewer=usuario)
+            .values('id', 'choice', 'article__title')
+        )
+
+        data = {
+            'id': usuario.id,
+            'full_name': usuario.full_name,
+            'email': usuario.email,
+            'affiliation': usuario.affiliation,
+            'role': usuario.role,
+            'authored_articles': authored_articles,
+            'assignments_reviews': list(assignments),
+            'bids': bids,
+        }
+
+        return JsonResponse(data, status=200, safe=False)
