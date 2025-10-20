@@ -25,7 +25,7 @@ class AssignmentReviewSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AssignmentReview
-        fields = ['id', 'article', 'article_title', 'reviewed']
+        fields = ['id', 'article', 'article_title', 'reviewed','reviewed_status']
 
 class ReviewerDetailSerializer(serializers.ModelSerializer):
     # Artículos asignados
@@ -80,3 +80,8 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
     def get_reviews_count(self, obj):
         """Cuenta cuántas revisiones ha completado el revisor"""
         return Review.objects.filter(reviewer=obj).count()
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = "__all__"
