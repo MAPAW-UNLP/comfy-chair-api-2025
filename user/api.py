@@ -97,3 +97,18 @@ class GetUsersNoAdminAPI(APIView):
             } for user in users
         ]
         return JsonResponse(users_data, safe=False, status=200)
+
+# Lo agregamos desde el grupo 3 para obtener usuarios por id
+# Por ahora se evita usar JWT, se agrega mas adelante
+class GetUserByIdAPI(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            user_data = {
+                'id': user.id,
+                'full_name': user.full_name,
+                'email': user.email,
+            }
+            return JsonResponse(user_data, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
