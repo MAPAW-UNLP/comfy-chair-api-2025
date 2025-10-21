@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'reviewer',
     'chair',
+    'notification.apps.NotificationConfig',
 ]
 
 MIDDLEWARE = [
@@ -60,8 +61,8 @@ MIDDLEWARE = [
 ]
 
 # Incluir JWTAuthenticationMiddleware solo fuera de DEBUG (producción)
-#if not DEBUG:
-  #  MIDDLEWARE.append('user.middleware.JWTAuthenticationMiddleware')
+if not DEBUG:
+    MIDDLEWARE.append('user.middleware.JWTAuthenticationMiddleware')
 
 ROOT_URLCONF = 'comfy_chair.urls'
 

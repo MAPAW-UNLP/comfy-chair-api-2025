@@ -9,6 +9,7 @@ from .serializers import UserSerializer, LoginSerializer
 from article.models import Article
 from reviewer.models import Review, AssignmentReview, Bid
 from django.db.models import OuterRef, Subquery
+from chair.models import ReviewAssignment
 
 class UserRegisterAPI(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -110,11 +111,11 @@ class GetUserFullDataAPI(APIView):
             article=OuterRef('article')
         ).values('score', 'opinion')[:1]
 
-        # Lista de artículos asignados o ya revisados
-        assignments = AssignmentReview.objects.filter(reviewer=usuario).annotate(
+        # Lista de artículos asignados
+        assignments = ReviewAssignment.objects.filter(reviewer=usuario).annotate(
             score=Subquery(reviews_subquery.values('score')),
             opinion=Subquery(reviews_subquery.values('opinion'))
-        ).values('id', 'reviewed', 'article__title', 'score', 'opinion')
+        ).values('id', 'article__title', 'score', 'opinion')
 
         # Bids enviados
         bids = list(
