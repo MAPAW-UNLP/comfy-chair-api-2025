@@ -91,7 +91,7 @@ class AvailableReviewersAPI(APIView):
             elif bid.interest == 'not_interested':
                 not_interested.append(reviewer_data)
 
-        reviewers_without_bid = User.objects.filter(is_reviewer=True).exclude(id__in=reviewers_with_bid_ids)
+        reviewers_without_bid = User.objects.filter(role = "user").exclude(id__in=reviewers_with_bid_ids)
         none_interest = [
             {
                 'id': reviewer.id,

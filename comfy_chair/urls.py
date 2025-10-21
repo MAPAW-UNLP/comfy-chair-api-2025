@@ -26,9 +26,9 @@ urlpatterns = [
     path('api/', include('article.urls')),
     path('api/', include('conference.urls')),
     path('api/', include('conference_session.urls')),
+    path('api/', include('chairs.urls')),
     #agregue esta linea para las urls de reviewer
     path('api/', include('reviewer.urls')),
-    path('api/', include('chairs.urls'))
 ]
 
 # Serve media files in development
