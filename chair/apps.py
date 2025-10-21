@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class ChairsConfig(AppConfig):
+class ChairConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'chairs'
+    name = 'chair'

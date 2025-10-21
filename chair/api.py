@@ -8,9 +8,9 @@ from article.models import Article
 from user.models import User
 
 
-class ChairsAPI(APIView):
+class ChairAPI(APIView):
     def get(self, request):
-        return JsonResponse({'message': 'Chairs endpoint working!'})
+        return JsonResponse({'message': 'Chair endpoint working!'})
 
 
 class CreateReviewAssignmentAPI(APIView):
