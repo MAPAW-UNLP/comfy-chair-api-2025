@@ -4,8 +4,8 @@ from rest_framework import status
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
-from reviewer.models import Review, Article, Bid, User
-from reviewer.serializers import ReviewSerializer, ReviewUpdateSerializer, ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer
+from reviewer.models import Review, Article, Bid, User,AssignmentReview
+from reviewer.serializers import ReviewUpdateSerializer, ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer,ReviewSerializer,AssignmentReviewSerializer
 
 # # GET /api/articles
 # class ArticleListView(APIView):
@@ -74,11 +74,79 @@ class ReviewerDetailView(APIView):
                 {"error": f"Usuario con ID {id} no encontrado"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-#verrrrrrrr
+
+#POST /api/reviews/
+#Guarda una nueva revisión y poner estado True
+class ReviewView(APIView):
+    def post(self, request):
+        serializer = ReviewSerializer(data = request.data)
+        if serializer.is_valid():
+            review = serializer.save()
+            # Si existe una asignación (AssignmentReview), la marco como revisada
+            try:
+                assignment = AssignmentReview.objects.get(
+                    reviewer=review.reviewer,                    
+                    article=review.article
+                )
+                assignment.reviewed = True
+                assignment.save()
+            except AssignmentReview.DoesNotExist:
+                pass
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#GET /api/review/{articleId}) 
+#Devuelve la revisión de un artículo
+class ReviewDetailView(APIView):
+    def get(self, request, articleId):
+        review = Review.objects.filter(article=articleId).first()
+        serializer = ReviewSerializer(review)
+        if not review:
+            return Response(
+               {"message":"No existe una revision de ese articulo"},
+               status = status.HTTP_404_NOT_FOUND
+           )
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+#GET /api/reviewers/id/review/
+#Devuelve las revisiones de un revisor con el estado 
+class ReviewerReviewsView(APIView):
+    def get(self, request, id):
+        review = AssignmentReview.objects.filter(reviewer=id)
+        serializer = AssignmentReviewSerializer(review,many=True)
+        if not review:
+            return Response(
+               {"message":"No existe revisiones del usuario"},
+               status = status.HTTP_404_NOT_FOUND
+           )
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+
+
+
+
+
+"""
+Esto no se  si va
+"""
+#POST /api/reviewer/assigment/
+#Asigna un articulo a revisar
+class AssignmentReviewCreateView(APIView):
+    def post(self, request):
+        serializer = AssignmentReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"message": "Artículo asignado correctamente al revisor."},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#verrrrrr
 #POST /api/reviews/{id}/submit
 #class ReviewView(APIView):
-#   def post(self, request):
-#        serializer = ReviewSerializer(data=request.data)
+#  def post(self, request):
+#       serializer = ReviewSerializer(data=request.data)
 #        if serializer.is_valid():
 #            serializer.save()
 #            return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -95,7 +163,7 @@ class ReviewUpdateView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
-#GET /api/reviews?articleId=123
+#GET /api/reviewsArticle?articleId=123
 class ReviewsArticleView(APIView):
    def get(self, request):
         article_id = request.GET.get('articleId')

@@ -25,7 +25,7 @@ class AssignmentReviewSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = AssignmentReview
-        fields = ['id', 'article', 'article_title', 'reviewed']
+        fields = ['id', 'article', 'article_title', 'reviewed','reviewed_status']
 
 class ReviewerDetailSerializer(serializers.ModelSerializer):
     # Artículos asignados
