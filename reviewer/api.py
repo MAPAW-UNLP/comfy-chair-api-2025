@@ -5,7 +5,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from reviewer.models import Review, Article, Bid, User
-from reviewer.serializers import ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer
+from reviewer.serializers import ReviewSerializer, ReviewUpdateSerializer, ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer
 
 # # GET /api/articles
 # class ArticleListView(APIView):
@@ -74,5 +74,34 @@ class ReviewerDetailView(APIView):
                 {"error": f"Usuario con ID {id} no encontrado"}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-
- 
+#verrrrrrrr
+#POST /api/reviews/{id}/submit
+#class ReviewView(APIView):
+#   def post(self, request):
+#        serializer = ReviewSerializer(data=request.data)
+#        if serializer.is_valid():
+#            serializer.save()
+#            return Response(serializer.data, status=status.HTTP_201_CREATED)
+#        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+#PUT /api/reviews/{id}
+class ReviewUpdateView(APIView):
+     def put(self, request, id):
+        #Busca el review con el id, si no lo encuentra retorna 404
+        review = get_object_or_404(Review, id=id)
+        serializer = ReviewUpdateSerializer(review, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+     
+#GET /api/reviews?articleId=123
+class ReviewsArticleView(APIView):
+   def get(self, request):
+        article_id = request.GET.get('articleId')
+        if not article_id:
+            return Response({"error": "articleId parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
+       
+        reviews = Review.objects.filter(article=article_id)
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data)
