@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from chairs.models import ReviewAssignment
+from chair.models import ReviewAssignment
 
 
 class ReviewAssignmentSerializer(serializers.ModelSerializer):

@@ -1,9 +1,9 @@
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from chairs.models import ReviewAssignment 
+from chair.models import ReviewAssignment 
 from reviewer.models import Bid
-from chairs.serializers import ReviewAssignmentSerializer
+from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
 
