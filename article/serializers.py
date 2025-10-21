@@ -5,7 +5,6 @@ from user.models import User
 from user.serializers import UserSerializer
 from .models import Article
 
-
 class ArticleSerializer(serializers.ModelSerializer):
     # Lectura
     session = SessionSerializer(read_only=True)
