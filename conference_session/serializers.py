@@ -14,5 +14,4 @@ class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
-        fields = ['id', 'title', 'deadline', 'capacity', 'conference', 'conference_id']
-
+        fields = '__all__'
