@@ -13,13 +13,19 @@ class ConferenceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_title(self, value):
-        # para el caso de guarda la edición se puede repetir el nombre
+        # para el caso de guardar la edición se puede repetir el nombre
         conferencia_id = self.instance.id if self.instance else None
         if Conference.objects.filter(title=value).exclude(id=conferencia_id).exists():
             raise serializers.ValidationError("Ya existe una conferencia con este nombre.")
         return value
-    
+
     def validate(self, data):
+        # exigir al menos un chair en creación
+        if self.instance is None:
+            chairs = data.get('chairs')
+            if not chairs or len(chairs) == 0:
+                raise serializers.ValidationError({"chairs": "Se requiere al menos un chair para crear la conferencia."})
+
         hoy = date.today()
         start_date = data.get('start_date')
         end_date = data.get('end_date')
