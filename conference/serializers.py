@@ -20,11 +20,16 @@ class ConferenceSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # exigir al menos un chair en creación
-        if self.instance is None:
-            chairs = data.get('chairs')
+        # normalizar lista final de chairs
+        chairs = data.get('chairs', None)
+        if chairs is None and self.instance is not None:
+            # usar los chairs actuales
+            if self.instance.chairs.count() == 0:
+                raise serializers.ValidationError({"chairs": "Se requiere al menos un chair para crear/editar la conferencia."})
+        else:
+            # creación o actualización con 'chairs' explícito
             if not chairs or len(chairs) == 0:
-                raise serializers.ValidationError({"chairs": "Se requiere al menos un chair para crear la conferencia."})
+                raise serializers.ValidationError({"chairs": "Se requiere al menos un chair para crear/editar la conferencia."})
 
         hoy = date.today()
         start_date = data.get('start_date')
