@@ -28,9 +28,7 @@ class SessionSerializer(serializers.ModelSerializer):
         return value
 
     def validate(self, data):
-        # Normalizar lista final de chairs:
-        # - si no viene 'chairs' en una edición, usar los chairs actuales de la instancia
-        # - si viene explícito (incluso vacío) aplicarlo tal cual
+        # Normalizar chairs final (si no viene en PATCH usar los existentes)
         chairs = data.get('chairs', None)
         if chairs is None and self.instance is not None:
             current_chairs_qs = self.instance.chairs.all()
@@ -38,27 +36,35 @@ class SessionSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"chairs": "Se requiere al menos un chair para la sesión."})
             chairs_final = current_chairs_qs
         else:
-            # creación o actualización con 'chairs' explícito
             if not chairs or len(chairs) == 0:
                 raise serializers.ValidationError({"chairs": "Se requiere al menos un chair para la sesión."})
             chairs_final = chairs
 
-        # Obtener la conferencia asociada (viene en data o en la instancia)
+        # Conference viene ya como instancia por conference_id (source='conference')
         conference = data.get('conference') or getattr(self.instance, 'conference', None)
         if conference is None:
-            # sin conferencia asociada no se puede validar la regla de exclusión aquí
-            return data
+            raise serializers.ValidationError({"conference": "Se requiere una conferencia válida para la sesión."})
 
+        # Si por alguna razón vino como PK, obtener la instancia
         if not isinstance(conference, Conference):
             try:
                 conference = Conference.objects.get(pk=conference)
             except Conference.DoesNotExist:
                 raise serializers.ValidationError({"conference": "Conferencia no encontrada."})
 
-        # ids de chairs de la conferencia
+        # 1) Verificar deadline 
+        deadline = data.get('deadline') if 'deadline' in data else getattr(self.instance, 'deadline', None)
+        if deadline is None:
+            raise serializers.ValidationError({"deadline": "Se requiere un deadline para la sesión."})
+
+        start = conference.start_date
+        end = conference.end_date
+        if start and end and (deadline < start or deadline > end):
+            raise serializers.ValidationError({"deadline": "El deadline debe estar entre las fechas de inicio y fin de la conferencia."})
+
+        # 2) Prohibir chairs que ya son chairs de la misma conferencia
         conf_chair_ids = set(conference.chairs.values_list('id', flat=True))
 
-        # Normalizar chairs_final a ids para comparar (acepta instancias o pks)
         chairs_ids = []
         for c in chairs_final:
             cid = getattr(c, 'id', None)
@@ -69,7 +75,6 @@ class SessionSerializer(serializers.ModelSerializer):
                     continue
             chairs_ids.append(cid)
 
-        # detectar offending ids (chairs que ya son chairs de la misma conferencia)
         offending = [cid for cid in chairs_ids if cid in conf_chair_ids]
         if offending:
             raise serializers.ValidationError({
