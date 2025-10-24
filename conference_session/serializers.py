@@ -18,6 +18,14 @@ class SessionSerializer(serializers.ModelSerializer):
         model = Session
         fields = '__all__'
 
+
+    def validate_title(self, value):
+        # permite cambiar el título del objeto actual 
+        session_id = self.instance.id if self.instance else None
+        if Session.objects.filter(title=value).exclude(id=session_id).exists():
+            raise serializers.ValidationError("Ya existe una sesión con este nombre.")
+        return value
+
     def validate(self, data):
         # exigir al menos un chair en creación
         if self.instance is None:

@@ -4,7 +4,7 @@ from conference.models import Conference
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Session(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=200, unique=True)
     deadline = models.DateField(
         null=False,
         blank=False
