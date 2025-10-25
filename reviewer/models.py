@@ -25,6 +25,7 @@ class Review(models.Model):
     )
     opinion = models.TextField()
     is_published = models.BooleanField(default=False)
+    is_edited = models.BooleanField(default = False)
     published_at = models.DateTimeField(null=True, blank=True)
     last_updated_after_publication = models.DateTimeField(null=True, blank=True)
     
