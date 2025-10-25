@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'reviewer',
     'chair',
+    'review_score',
 ]
 
 MIDDLEWARE = [
