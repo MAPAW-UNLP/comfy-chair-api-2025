@@ -176,3 +176,4 @@ class CutoffSelectionAPI(APIView):
             ],
         }
         return JsonResponse(response_data, status=200)
+    
