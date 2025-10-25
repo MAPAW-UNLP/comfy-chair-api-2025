@@ -127,11 +127,6 @@ class CutoffSelectionAPI(APIView):
             session = Session.objects.get(id=session_id)
         except Session.DoesNotExist:
             return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
-        if session.status != "review":
-            return JsonResponse(
-                {"error": "Solo se puede ejecutar la selección en sesiones en estado 'review'."},
-                status=400
-            )
         if not session.capacity or session.capacity <= 0:
             return JsonResponse(
                 {"error": "La sesión no tiene definida una capacidad válida."},
@@ -159,11 +154,8 @@ class CutoffSelectionAPI(APIView):
         rejected_articles = articles[cutoff_index:]
         Article.objects.filter(id__in=[a.id for a in accepted_articles]).update(status="accepted")
         Article.objects.filter(id__in=[a.id for a in rejected_articles]).update(status="rejected")
-        session.status = "selection"
-        session.save(update_fields=["status"])
         response_data = {
             "session": session.title,
-            "new_status": session.status,
             "capacity": session.capacity,
             "total_articles": total_articles,
             "accepted_count": len(accepted_articles),
