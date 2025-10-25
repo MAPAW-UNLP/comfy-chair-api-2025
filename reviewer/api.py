@@ -111,6 +111,45 @@ class ReviewDetailView(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 
+   
+#PUT /api/reviews/{id}/publish/
+class ReviewPublishView(APIView):
+     def put(self, request, id):
+        #Busca el review con el id, si no lo encuentra retorna 404
+        review = get_object_or_404(Review, id=id)
+        if review.is_published:
+            return Response(
+                {"error": "La revisión ya está publicada"},
+                status=status.HTTP_400_BAD_REQUEST
+            )       
+        if review.score is None:
+            return Response(
+                {"error": "La revisión debe tener una puntuación para ser publicada"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if not review.opinion :
+            return Response(
+                {"error": "La revision debe tener una opinion para ser publicada"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        #Marca como publicado
+        serializer = ReviewUpdateSerializer(
+            review, 
+            data={'is_published': True}, 
+            partial=True  
+        )
+        
+        if serializer.is_valid():
+            updated_review = serializer.save()
+            return Response(
+                ReviewSerializer(updated_review).data, 
+                status=status.HTTP_200_OK
+            )
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
 #PUT /api/reviews/{id}
 class ReviewUpdateView(APIView):
      def put(self, request, id):
@@ -118,8 +157,13 @@ class ReviewUpdateView(APIView):
         review = get_object_or_404(Review, id=id)
         serializer = ReviewUpdateSerializer(review, data=request.data, partial=True)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            # Si ya estaba publicado, marcar como editado
+            if review.is_published:
+                updated_review = serializer.save(is_edited=True)
+            else:
+                updated_review = serializer.save()
+            
+            return Response(ReviewSerializer(updated_review).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
 #GET /api/reviewsArticle?articleId=123
@@ -129,6 +173,7 @@ class ReviewsArticleView(APIView):
         if not article_id:
             return Response({"error": "articleId parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
        
-        reviews = Review.objects.filter(article=article_id)
+        # SOLO revisiones publicadas
+        reviews = Review.objects.filter(article=article_id, is_published=True)
         serializer = ReviewSerializer(reviews, many=True)
         return Response(serializer.data)
