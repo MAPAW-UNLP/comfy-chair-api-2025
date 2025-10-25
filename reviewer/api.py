@@ -142,15 +142,7 @@ class AssignmentReviewCreateView(APIView):
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-#verrrrrr
-#POST /api/reviews/{id}/submit
-#class ReviewView(APIView):
-#  def post(self, request):
-#       serializer = ReviewSerializer(data=request.data)
-#        if serializer.is_valid():
-#            serializer.save()
-#            return Response(serializer.data, status=status.HTTP_201_CREATED)
-#        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 #PUT /api/reviews/{id}
 class ReviewUpdateView(APIView):

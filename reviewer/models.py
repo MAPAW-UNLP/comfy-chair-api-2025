@@ -24,6 +24,9 @@ class Review(models.Model):
         validators=[MinValueValidator(-3), MaxValueValidator(3)]
     )
     opinion = models.TextField()
+    is_published = models.BooleanField(default=False)
+    published_at = models.DateTimeField(null=True, blank=True)
+    last_updated_after_publication = models.DateTimeField(null=True, blank=True)
     
 class Bid(models.Model):
     STATE_CHOICES = [

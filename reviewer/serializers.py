@@ -85,9 +85,9 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id','reviewer','article','score','opinion']
+        fields = ['id','reviewer','article','score','opinion','is_published','published_at','last_updated_after_publication']
 
 class ReviewUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['score','opinion']  
+        fields = ['score','opinion', 'is_published','published_at','last_updated_after_publication' ]  
