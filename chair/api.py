@@ -1,11 +1,14 @@
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 from chair.models import ReviewAssignment 
+from conference_session.models import Session
 from reviewer.models import Bid
 from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
+from review_score.models import ReviewScore
 
 
 class ChairAPI(APIView):
@@ -117,3 +120,53 @@ class AvailableReviewersAPI(APIView):
         final_reviewer_list = sorted(final_reviewer_list, key=lambda r: not r['assigned'])
 
         return JsonResponse(final_reviewer_list, safe=False)
+    
+    
+class CutoffSelectionAPI(APIView):
+    def post(self, request, session_id):
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
+        if not session.capacity or session.capacity <= 0:
+            return JsonResponse(
+                {"error": "La sesión no tiene definida una capacidad válida."},
+                status=400
+            )
+        if not Article.objects.filter(session=session).exists():
+            return JsonResponse(
+                {'message': 'La sesión no tiene artículos asociados.'},
+                status=400
+            )
+        articles = (
+            Article.objects.filter(session=session)
+            .annotate(avg_score=Avg("review_scores__score"))
+            .exclude(avg_score=None)
+            .order_by("-avg_score")
+        )
+        if not articles.exists():
+            return JsonResponse(
+                {'message': 'No hay artículos con puntajes disponibles para esta sesión.'},
+                status=200
+            )
+        total_articles = articles.count()
+        cutoff_index = min(session.capacity, total_articles)
+        accepted_articles = articles[:cutoff_index]
+        rejected_articles = articles[cutoff_index:]
+        Article.objects.filter(id__in=[a.id for a in accepted_articles]).update(status="accepted")
+        Article.objects.filter(id__in=[a.id for a in rejected_articles]).update(status="rejected")
+        response_data = {
+            "session": session.title,
+            "capacity": session.capacity,
+            "total_articles": total_articles,
+            "accepted_count": len(accepted_articles),
+            "rejected_count": len(rejected_articles),
+            "accepted_articles": [
+                {"id": a.id, "title": a.title, "avg_score": a.avg_score} for a in accepted_articles
+            ],
+            "rejected_articles": [
+                {"id": a.id, "title": a.title, "avg_score": a.avg_score} for a in rejected_articles
+            ],
+        }
+        return JsonResponse(response_data, status=200)
+    
