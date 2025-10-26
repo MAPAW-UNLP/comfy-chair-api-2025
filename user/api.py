@@ -100,38 +100,92 @@ class GetUserFullDataAPI(APIView):
         except User.DoesNotExist:
             return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
 
-        # Artículos donde es autor o autor correspondiente
-        authored_articles = list(
-            Article.objects.filter(authors=usuario).values('id', 'title', 'status', 'type')
-        )
-
-        # Subquery para traer score y opinion si ya existe revisión
+        # Subquery para obtener score y opinion si ya existe revisión
         reviews_subquery = Review.objects.filter(
             reviewer=usuario,
             article=OuterRef('article')
         ).values('score', 'opinion')[:1]
 
-        # Lista de artículos asignados
-        assignments = ReviewAssignment.objects.filter(reviewer=usuario).annotate(
+        # Artículos donde el usuario es autor
+        authored_articles = Article.objects.filter(authors=usuario).select_related('session__conference')
+
+        # Artículos asignados al usuario como revisor
+        assigned_reviews = ReviewAssignment.objects.filter(reviewer=usuario).annotate(
             score=Subquery(reviews_subquery.values('score')),
             opinion=Subquery(reviews_subquery.values('opinion'))
-        ).values('id', 'article__title', 'score', 'opinion')
+        ).select_related('article__session__conference')
 
-        # Bids enviados
-        bids = list(
-            Bid.objects.filter(reviewer=usuario)
-            .values('id', 'choice', 'article__title')
-        )
+        # Estructura jerárquica: conferencia → sesión → roles → artículos
+        conferences_data = {}
 
+        # Procesar artículos donde es autor
+        for art in authored_articles:
+            conf = art.session.conference
+            sess = art.session
+            conf_entry = conferences_data.setdefault(conf.id, {
+                'conference_id': conf.id,
+                'conference_name': conf.title,
+                'sessions': {}
+            })
+            sess_entry = conf_entry['sessions'].setdefault(sess.id, {
+                'session_id': sess.id,
+                'session_name': sess.title,
+                'roles': {}
+            })
+            role_entry = sess_entry['roles'].setdefault('autor', [])
+            role_entry.append({
+                'id': art.id,
+                'title': art.title,
+                'status': art.status,
+                'type': art.type,
+            })
+
+        # Procesar artículos donde es revisor
+        for assign in assigned_reviews:
+            art = assign.article
+            conf = art.session.conference
+            sess = art.session
+            conf_entry = conferences_data.setdefault(conf.id, {
+                'conference_id': conf.id,
+                'conference_name': conf.title,
+                'sessions': {}
+            })
+            sess_entry = conf_entry['sessions'].setdefault(sess.id, {
+                'session_id': sess.id,
+                'session_name': sess.title,
+                'roles': {}
+            })
+            role_entry = sess_entry['roles'].setdefault('revisor', [])
+            role_entry.append({
+                'id': art.id,
+                'title': art.title,
+                'score': assign.score,
+                'opinion': assign.opinion,
+            })
+
+        # Convertir dicts a listas
+        conferences_list = []
+        for conf_data in conferences_data.values():
+            sessions_list = []
+            for sess_data in conf_data['sessions'].values():
+                roles_list = []
+                for role, arts in sess_data['roles'].items():
+                    roles_list.append({'role': role, 'articles': arts})
+                sess_data['roles'] = roles_list
+                sessions_list.append(sess_data)
+            conf_data['sessions'] = sessions_list
+            conferences_list.append(conf_data)
+
+        # Estructura final con información del usuario + conferencias
         data = {
-            'id': usuario.id,
-            'full_name': usuario.full_name,
-            'email': usuario.email,
-            'affiliation': usuario.affiliation,
-            'role': usuario.role,
-            'authored_articles': authored_articles,
-            'assignments_reviews': list(assignments),
-            'bids': bids,
+            'user': {
+                'id': usuario.id,
+                'full_name': usuario.full_name,
+                'email': usuario.email,
+                'affiliation': usuario.affiliation,
+                'role': usuario.role,
+            },
+            'conferences': conferences_list
         }
 
-        return JsonResponse(data, status=200, safe=False)
+        return JsonResponse(data, safe=False, status=200)
