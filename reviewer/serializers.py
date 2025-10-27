@@ -1,6 +1,7 @@
 
 from rest_framework import serializers
-from reviewer.models import AssignmentReview, Review, User,Article,Bid
+from reviewer.models import  Review, User,Article,Bid
+from chair.models import ReviewAssignment
 
 
 class ArticleSerializer(serializers.ModelSerializer):
@@ -24,7 +25,7 @@ class AssignmentReviewSerializer(serializers.ModelSerializer):
     reviewed_status = serializers.CharField(source='get_reviewed_display', read_only=True)
     
     class Meta:
-        model = AssignmentReview
+        model = ReviewAssignment
         fields = ['id', 'article', 'article_title', 'reviewed','reviewed_status']
 
 class ReviewerDetailSerializer(serializers.ModelSerializer):

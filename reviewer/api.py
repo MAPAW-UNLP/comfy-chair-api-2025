@@ -112,7 +112,7 @@ class ReviewDetailView(APIView):
 
 
    
-#PUT /api/reviews/{id}/publish/
+#PUT /api/reviews/{idReview}/publish/
 class ReviewPublishView(APIView):
      def put(self, request, id):
         #Busca el review con el id, si no lo encuentra retorna 404
@@ -150,7 +150,7 @@ class ReviewPublishView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     
-#PUT /api/reviews/{id}
+#PUT /api/reviews/<int:id>/update/
 class ReviewUpdateView(APIView):
      def put(self, request, id):
         #Busca el review con el id, si no lo encuentra retorna 404
@@ -166,14 +166,14 @@ class ReviewUpdateView(APIView):
             return Response(ReviewSerializer(updated_review).data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
      
-#GET /api/reviewsArticle?articleId=123
+#GET /api/article/<int:article_id>/reviews/    
 class ReviewsArticleView(APIView):
-   def get(self, request):
-        article_id = request.GET.get('articleId')
-        if not article_id:
-            return Response({"error": "articleId parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
-       
+   def get(self, request, article_id):  
         # SOLO revisiones publicadas
         reviews = Review.objects.filter(article=article_id, is_published=True)
         serializer = ReviewSerializer(reviews, many=True)
-        return Response(serializer.data)
+        return Response({
+            "article_id": article_id,
+            "count": reviews.count(),
+            "reviews": serializer.data
+        })

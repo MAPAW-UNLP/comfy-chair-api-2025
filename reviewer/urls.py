@@ -10,7 +10,7 @@ urlpatterns = [
     path('reviewers/<int:id>/', ReviewerDetailView.as_view(), name='reviewer-detail'),
     path('reviews/',ReviewView.as_view(),name="create-review"),
     path('reviews/<int:articleId>/',ReviewDetailView.as_view(),name="review-detail"),
-    path('reviews/<int:id>',ReviewUpdateView.as_view(),name="review-update"),
+    path('reviews/<int:id>/update/',ReviewUpdateView.as_view(),name="review-update"),
     path('reviews/<int:id>/publish/', ReviewPublishView.as_view(), name='review-publish'),
-    path('reviews/article',ReviewsArticleView.as_view(),name="reviews-article")
+    path('article/<int:article_id>/reviews/',ReviewsArticleView.as_view(),name="reviews-article")
 ]
