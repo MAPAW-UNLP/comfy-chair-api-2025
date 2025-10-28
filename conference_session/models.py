@@ -48,14 +48,11 @@ class Session(models.Model):
         return f"{self.title} ({self.conference.title})"
 
     def clean(self):
-        # validar que exista conference y deadline antes de comparar
-        if self.deadline is None or self.conference is None:
-            return
-
-        start = self.conference.start_date
-        end = self.conference.end_date
-        if start and end:
-            if self.deadline < start or self.deadline > end:
+        # Validar que el deadline esté dentro del rango de la conferencia
+        if self.conference and self.deadline:
+            start = self.conference.start_date
+            end = self.conference.end_date
+            if start and end and (self.deadline < start or self.deadline > end):
                 raise ValidationError({
                     'deadline': 'La fecha de deadline debe estar entre las fechas de inicio y fin de la conferencia.'
                 })
@@ -67,5 +64,10 @@ class Session(models.Model):
 
     class Meta:
         constraints = [
-            UniqueConstraint(Lower('title'), name='unique_session_title_ci')
+            # Título único por conferencia no distinguimos mayúsculas/minúsculas
+            UniqueConstraint(
+                Lower('title'), 
+                'conference', 
+                name='unique_session_title_per_conference_ci'
+            )
         ]

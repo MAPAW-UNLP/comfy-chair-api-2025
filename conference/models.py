@@ -15,11 +15,11 @@ class Conference (models.Model):
 
     description = models.CharField(max_length=300)
     start_date = models.DateField(
-        null=False,
+        null=False, 
         blank=False
     )
     end_date = models.DateField(
-        null=False,
+        null=False, 
         blank=False
     )
     # tipo de lectura 
@@ -28,7 +28,7 @@ class Conference (models.Model):
         choices=VISTA_CHOICES,
         default='completo'
     )
-
+    
     # lista de chairs
     chairs = models.ManyToManyField(
         User,
@@ -38,9 +38,12 @@ class Conference (models.Model):
     
     def __str__(self):
         return self.title
-    
-    # constraints para que el titulo sea unico sin importar mayusculas o minusculas
+
     class Meta:
+        # la conferencia no acepta títulos duplicados no distinguimos mayúsculas/minúsculas
         constraints = [
-            UniqueConstraint(Lower('title'), name='unique_conference_title_ci')
+            UniqueConstraint(
+                Lower('title'),
+                name='unique_conference_title_ci'
+            )
         ]
