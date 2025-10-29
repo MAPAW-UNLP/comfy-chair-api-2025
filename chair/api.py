@@ -124,15 +124,35 @@ class AvailableReviewersAPI(APIView):
     
 class CutoffSelectionAPI(APIView):
     def post(self, request, session_id):
+        percentage = request.data.get("percentage", 100)
+        # Validación de porcentaje
+        try:
+            percentage = float(percentage)
+            if percentage <= 0 or percentage > 100:
+                return JsonResponse(
+                    {"error": "El porcentaje debe estar entre 0 y 100."},
+                    status=400
+                )
+        except (ValueError, TypeError):
+            return JsonResponse(
+                {"error": "El porcentaje debe ser un número válido."},
+                status=400
+            )
+
+        # Busca la sesion
         try:
             session = Session.objects.get(id=session_id)
         except Session.DoesNotExist:
             return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
+
+        # Verifica capacidad de la sesion
         if not session.capacity or session.capacity <= 0:
             return JsonResponse(
                 {"error": "La sesión no tiene definida una capacidad válida."},
                 status=400
             )
+
+        # Busca articulos en la sesion
         if not Article.objects.filter(session=session).exists():
             return JsonResponse(
                 {'message': 'La sesión no tiene artículos asociados.'},
@@ -149,15 +169,21 @@ class CutoffSelectionAPI(APIView):
                 {'message': 'No hay artículos con puntajes disponibles para esta sesión.'},
                 status=200
             )
+
         total_articles = articles.count()
-        cutoff_index = min(session.capacity, total_articles)
+
+        cutoff_index = min(int((percentage / 100) * total_articles), total_articles)
+        
         accepted_articles = articles[:cutoff_index]
         rejected_articles = articles[cutoff_index:]
+        
         Article.objects.filter(id__in=[a.id for a in accepted_articles]).update(status="accepted")
         Article.objects.filter(id__in=[a.id for a in rejected_articles]).update(status="rejected")
+        
         response_data = {
             "session": session.title,
             "capacity": session.capacity,
+            "percentage": percentage,
             "total_articles": total_articles,
             "accepted_count": len(accepted_articles),
             "rejected_count": len(rejected_articles),
@@ -198,6 +224,12 @@ class ScoreThresholdSelectionAPI(APIView):
                 {"error": "El valor de corte debe ser un número válido."},
                 status=400
             )
+
+        if not (-3 <= cutoff_score <= 3):
+                    return JsonResponse(
+                        {"error": "El valor de corte debe estar entre -3 y 3."},
+                        status=400
+                    )
 
         # Buscar la sesión
         try:
