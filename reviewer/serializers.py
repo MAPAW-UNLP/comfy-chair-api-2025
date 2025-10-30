@@ -7,7 +7,7 @@ from chair.models import ReviewAssignment
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = ['id', 'title', 'description']
+        fields = ['id', 'title', 'abstact']
 
 class BidSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,7 +58,7 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
 
     def get_assigned_articles(self, obj):
         """Obtiene la lista de nombres de artículos asignados"""
-        assigned_articles = AssignmentReview.objects.filter(
+        assigned_articles = ReviewAssignment.objects.filter(
             reviewer=obj
         ).select_related('article')
         

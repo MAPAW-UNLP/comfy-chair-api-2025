@@ -177,3 +177,12 @@ class ReviewsArticleView(APIView):
             "count": reviews.count(),
             "reviews": serializer.data
         })
+   
+# GET /api/reviews/{articleId}/{reviewerId}/
+class ReviewByReviewerView(APIView):
+    def get(self, request, articleId, reviewerId):
+        review = Review.objects.filter(article_id=articleId, reviewer_id=reviewerId).first()
+        if not review:
+            return Response({"message": "No existe una revisión de ese artículo para este revisor"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ReviewSerializer(review)
+        return Response(serializer.data, status=status.HTTP_200_OK)
