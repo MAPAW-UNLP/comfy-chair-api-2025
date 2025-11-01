@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'conference',
     'conference_session',
     'rest_framework',
+    'reviewer',
+    'chair',
 ]
 
 MIDDLEWARE = [
