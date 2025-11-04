@@ -4,17 +4,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from article.models import Article
 from user.models import User
 
-class AssignmentReview(models.Model):
-    reviewer = models.ForeignKey(
-        'user.User',  # <-- referencia correcta
-        on_delete=models.CASCADE,
-        related_name='assignmentreviews'
-    )
-    article = models.ForeignKey('article.Article', on_delete=models.CASCADE)  # <-- referencia correcta
-    reviewed = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('reviewer', 'article')
     
 class Review(models.Model):
     #reviewer = models.ForeignKey('auth.User')
@@ -24,6 +14,9 @@ class Review(models.Model):
         validators=[MinValueValidator(-3), MaxValueValidator(3)]
     )
     opinion = models.TextField()
+    is_published = models.BooleanField(default=False)
+    is_edited = models.BooleanField(default = False)
+    
     
 class Bid(models.Model):
     STATE_CHOICES = [
