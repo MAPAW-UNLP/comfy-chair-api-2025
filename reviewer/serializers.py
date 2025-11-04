@@ -1,12 +1,14 @@
 
 from rest_framework import serializers
-from reviewer.models import AssignmentReview, Review, User,Article,Bid
+from reviewer.models import  Review, User,Article,Bid
+from chair.models import ReviewAssignment
 
 
 class ArticleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Article
-        fields = ['id', 'title', 'description']
+        # corregir typo 'abstract'
+        fields = ['id', 'title', 'abstract']
 
 class BidSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,11 +23,13 @@ class BidUpdateSerializer(serializers.ModelSerializer):
 
 class AssignmentReviewSerializer(serializers.ModelSerializer):
     article_title = serializers.CharField(source='article.title', read_only=True)
+    # Añadimos 'title' para compatibilidad con el frontend que espera ese campo
+    title = serializers.CharField(source='article.title', read_only=True)
     reviewed_status = serializers.CharField(source='get_reviewed_display', read_only=True)
     
     class Meta:
-        model = AssignmentReview
-        fields = ['id', 'article', 'article_title', 'reviewed']
+        model = ReviewAssignment
+        fields = ['id', 'article', 'article_title', 'title', 'reviewed','reviewed_status']
 
 class ReviewerDetailSerializer(serializers.ModelSerializer):
     # Artículos asignados
@@ -57,11 +61,15 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
 
     def get_assigned_articles(self, obj):
         """Obtiene la lista de nombres de artículos asignados"""
-        assigned_articles = AssignmentReview.objects.filter(
+        # Devolver información estructurada de las asignaciones para que el
+        # frontend tenga access al `id` y al `title` (evita NaN/undefined)
+        assigned_articles = ReviewAssignment.objects.filter(
             reviewer=obj
         ).select_related('article')
-        
-        return [assignment.article.title for assignment in assigned_articles]
+
+        # Reutilizamos el serializer local `AssignmentReviewSerializer` que
+        # incluye `article_title` (necesario para que el frontend muestre el título)
+        return AssignmentReviewSerializer(assigned_articles, many=True).data
 
     def get_bidding_status(self, obj):
         """Verifica si el revisor ha realizado algún bidding"""
@@ -80,3 +88,14 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
     def get_reviews_count(self, obj):
         """Cuenta cuántas revisiones ha completado el revisor"""
         return Review.objects.filter(reviewer=obj).count()
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['id','reviewer','article','score','opinion','is_published']
+
+class ReviewUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ['score','opinion', 'is_published','is_edited' ]  
