@@ -63,3 +63,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{article.source_file.name.split("/")[-1]}"'
         return response
     
+    @action(detail=True, methods=['delete'])
+    def delete_article(self, request, pk=None):
+        article = self.get_object()
+        article.delete()
+        return Response({'message': 'Artículo eliminado correctamente'}, status=status.HTTP_200_OK)
+    
