@@ -75,6 +75,7 @@ class GetUserIdAPI(APIView):
             'full_name': usuario.full_name,
             'email': usuario.email,
             'affiliation': usuario.affiliation,
+            'role': usuario.role,
         }, status=200)
     
 # Creado por el Grupo 1 para traer todos los usuarios de la base de datos
@@ -88,6 +89,7 @@ class GetUserListAPI(APIView):
                 'id': usuario.id,
                 'full_name': usuario.full_name,
                 'email': usuario.email,
+                'affiliation': usuario.affiliation,
                 'role': usuario.role,
             } for usuario in usuarios
         ]
