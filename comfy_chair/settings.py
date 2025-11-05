@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-pp8bwt0_d7o$v)3rrxqf0xs#7%8^@z3u_ad(a132&=1l%t(kci
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ⬅️ Necesario para evitar DisallowedHost al usar test Client y acceder por localhost
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 
 # Application definition
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     'reviewer',
     'chair',
     'notification.apps.NotificationConfig',
+    'review_score',
 ]
 
 MIDDLEWARE = [
@@ -129,10 +131,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'  # ⬅️ con slash inicial
 
 # Media files (uploads)
-MEDIA_URL = 'media/'
+MEDIA_URL = '/media/'    # ⬅️ con slash inicial (necesario para servir archivos)
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type

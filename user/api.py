@@ -88,7 +88,6 @@ class GetUserListAPI(APIView):
         ]
         return JsonResponse(usuarios_data, safe=False, status=200)
 
-
 class GetUserFullDataAPI(APIView):
     def get(self, request):
         user_id = getattr(request, 'user_id', None)
@@ -189,3 +188,33 @@ class GetUserFullDataAPI(APIView):
         }
 
         return JsonResponse(data, safe=False, status=200)
+
+# Lo agregamos desde el grupo 3 para obtener usuarios que sean solo user, se ordena alfabeticamente
+# Por ahora se evita usar JWT, se agrega mas adelante
+class GetUsersNoAdminAPI(APIView):
+    def get(self, request):
+        users = User.objects.filter(role="user").order_by('full_name')
+        users_data = [
+            {
+                'id': user.id,
+                'full_name': user.full_name,
+                'email': user.email,
+            } for user in users
+        ]
+        return JsonResponse(users_data, safe=False, status=200)
+
+# Lo agregamos desde el grupo 3 para obtener usuarios por id
+# Por ahora se evita usar JWT, se agrega mas adelante
+class GetUserByIdAPI(APIView):
+    def get(self, request, user_id):
+        try:
+            user = User.objects.get(id=user_id)
+            user_data = {
+                'id': user.id,
+                'full_name': user.full_name,
+                'email': user.email,
+            }
+            return JsonResponse(user_data, status=200)
+        except User.DoesNotExist:
+            return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
