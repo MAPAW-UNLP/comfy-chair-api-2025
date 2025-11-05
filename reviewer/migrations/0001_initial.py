@@ -11,6 +11,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('article', '0001_initial'),
+        ('article', '0001_initial'),
     ]
 
     operations = [
