@@ -88,6 +88,7 @@ class GetUserListAPI(APIView):
                 'id': usuario.id,
                 'full_name': usuario.full_name,
                 'email': usuario.email,
+                'role': usuario.role,
             } for usuario in usuarios
         ]
         return JsonResponse(usuarios_data, safe=False, status=200)
