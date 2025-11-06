@@ -1,11 +1,14 @@
 from rest_framework.views import APIView
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 from chair.models import ReviewAssignment 
+from conference_session.models import Session
 from reviewer.models import Bid
 from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
+from review_score.models import ReviewScore
 
 
 class ChairAPI(APIView):
@@ -117,3 +120,159 @@ class AvailableReviewersAPI(APIView):
         final_reviewer_list = sorted(final_reviewer_list, key=lambda r: not r['assigned'])
 
         return JsonResponse(final_reviewer_list, safe=False)
+    
+    
+class CutoffSelectionAPI(APIView):
+    def post(self, request, session_id):
+        percentage = request.data.get("percentage", 100)
+        # Validación de porcentaje
+        try:
+            percentage = float(percentage)
+            if percentage <= 0 or percentage > 100:
+                return JsonResponse(
+                    {"error": "El porcentaje debe estar entre 0 y 100."},
+                    status=400
+                )
+        except (ValueError, TypeError):
+            return JsonResponse(
+                {"error": "El porcentaje debe ser un número válido."},
+                status=400
+            )
+
+        # Busca la sesion
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
+
+        # Verifica capacidad de la sesion
+        if not session.capacity or session.capacity <= 0:
+            return JsonResponse(
+                {"error": "La sesión no tiene definida una capacidad válida."},
+                status=400
+            )
+
+        # Busca articulos en la sesion
+        if not Article.objects.filter(session=session).exists():
+            return JsonResponse(
+                {'message': 'La sesión no tiene artículos asociados.'},
+                status=400
+            )
+        articles = (
+            Article.objects.filter(session=session)
+            .annotate(avg_score=Avg("review_scores__score"))
+            .exclude(avg_score=None)
+            .order_by("-avg_score")
+        )
+        if not articles.exists():
+            return JsonResponse(
+                {'message': 'No hay artículos con puntajes disponibles para esta sesión.'},
+                status=200
+            )
+
+        total_articles = articles.count()
+
+        cutoff_index = min(int((percentage / 100) * total_articles), total_articles)
+        
+        accepted_articles = articles[:cutoff_index]
+        rejected_articles = articles[cutoff_index:]
+        
+        Article.objects.filter(id__in=[a.id for a in accepted_articles]).update(status="accepted")
+        Article.objects.filter(id__in=[a.id for a in rejected_articles]).update(status="rejected")
+        
+        response_data = {
+            "session": session.title,
+            "capacity": session.capacity,
+            "percentage": percentage,
+            "total_articles": total_articles,
+            "accepted_count": len(accepted_articles),
+            "rejected_count": len(rejected_articles),
+            "accepted_articles": [
+                {"id": a.id, "title": a.title, "avg_score": a.avg_score} for a in accepted_articles
+            ],
+            "rejected_articles": [
+                {"id": a.id, "title": a.title, "avg_score": a.avg_score} for a in rejected_articles
+            ],
+        }
+        return JsonResponse(response_data, status=200)
+    
+
+class ScoreThresholdSelectionAPI(APIView):
+    """
+    Acepta todos los artículos que tienen un puntaje promedio superior
+    a un valor de corte definido en la solicitud.
+
+    Ejemplo: 
+    {
+    "cutoff_score": 7.5
+    }
+    """
+
+    def post(self, request, session_id):
+        # Obtener el valor de corte (cutoff score)
+        cutoff_score = request.data.get("cutoff_score")
+        if cutoff_score is None:
+            return JsonResponse(
+                {"error": "Debe proporcionar un valor de corte (cutoff_score)."},
+                status=400
+            )
+
+        try:
+            cutoff_score = float(cutoff_score)
+        except ValueError:
+            return JsonResponse(
+                {"error": "El valor de corte debe ser un número válido."},
+                status=400
+            )
+
+        if not (-3 <= cutoff_score <= 3):
+                    return JsonResponse(
+                        {"error": "El valor de corte debe estar entre -3 y 3."},
+                        status=400
+                    )
+
+        # Buscar la sesión
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            return JsonResponse({"error": "Sesión no encontrada."}, status=404)
+
+        # Verificar si tiene artículos
+        articles = (
+            Article.objects.filter(session=session)
+            .annotate(avg_score=Avg("review_scores__score"))
+            .exclude(avg_score=None)
+        )
+
+        if not articles.exists():
+            return JsonResponse(
+                {"message": "No hay artículos con puntajes disponibles para esta sesión."},
+                status=200
+            )
+
+        # Seleccionar según el valor de corte
+        accepted_articles = articles.filter(avg_score__gt=cutoff_score)
+        rejected_articles = articles.exclude(avg_score__gt=cutoff_score)
+
+        # Actualizar estados
+        Article.objects.filter(id__in=[a.id for a in accepted_articles]).update(status="accepted")
+        Article.objects.filter(id__in=[a.id for a in rejected_articles]).update(status="rejected")
+
+        # Preparar respuesta
+        response_data = {
+            "session": session.title,
+            "cutoff_score": cutoff_score,
+            "total_articles": articles.count(),
+            "accepted_count": accepted_articles.count(),
+            "rejected_count": rejected_articles.count(),
+            "accepted_articles": [
+                {"id": a.id, "title": a.title, "avg_score": a.avg_score}
+                for a in accepted_articles
+            ],
+            "rejected_articles": [
+                {"id": a.id, "title": a.title, "avg_score": a.avg_score}
+                for a in rejected_articles
+            ],
+        }
+
+        return JsonResponse(response_data, status=200)
