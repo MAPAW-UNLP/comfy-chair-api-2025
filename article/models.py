@@ -1,6 +1,6 @@
+from user.models import User
 from django.db import models
 from conference_session.models import Session
-from user.models import User
 
 class Article(models.Model):
 
@@ -21,7 +21,7 @@ class Article(models.Model):
         ('rejected', 'Rechazado'),
     ]
 
-    # Atributos (Adaptados Para el Primer Merge)
+    # Atributos
     title = models.CharField(max_length=200)
     main_file = models.FileField(upload_to='articles/')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='reception')
@@ -36,4 +36,4 @@ class Article(models.Model):
 
     def __str__(self):
         return self.title
-
+    

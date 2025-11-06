@@ -1,11 +1,12 @@
+from .models import Article
+from user.models import User
 from rest_framework import serializers
+from user.serializers import UserSerializer
 from conference_session.models import Session
 from conference_session.serializers import SessionSerializer
-from user.models import User
-from user.serializers import UserSerializer
-from .models import Article
 
 class ArticleSerializer(serializers.ModelSerializer):
+
     # Lectura
     session = SessionSerializer(read_only=True)
     authors = UserSerializer(many=True, read_only=True)
@@ -31,3 +32,4 @@ class ArticleSerializer(serializers.ModelSerializer):
             'authors_ids', 'corresponding_author_id',
             'session', 'session_id'
         ]
+    

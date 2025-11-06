@@ -1,17 +1,21 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
 from rest_framework import status
 from article.models import Article
+from rest_framework import viewsets
 from .serializers import ArticleSerializer
-from django.http import FileResponse, Http404
-from rest_framework.decorators import action
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.http import FileResponse, Http404
 
 class ArticleViewSet(viewsets.ModelViewSet):
+    
     queryset = Article.objects.all()
-
+    
     serializer_class = ArticleSerializer
     
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para el alta de un articulo
+    #------------------------------------------------------------
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -24,12 +28,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
-    @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
-    def getArticlesBySessionId(self, request, session_id=None):
-        articles = Article.objects.filter(session_id=session_id)
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
-    
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para la modificación de un articulo
+    #------------------------------------------------------------
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -44,6 +45,18 @@ class ArticleViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response(serializer.data)
     
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para la baja de un articulo
+    #------------------------------------------------------------
+    @action(detail=True, methods=['delete'])
+    def delete_article(self, request, pk=None):
+        article = self.get_object()
+        article.delete()
+        return Response({'message': 'Artículo eliminado correctamente'}, status=status.HTTP_200_OK)
+    
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para descargar el archivo principal
+    #------------------------------------------------------------
     @action(detail=True, methods=['get'])
     def download_main(self, request, pk=None):
         article = self.get_object()
@@ -53,6 +66,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{article.main_file.name.split("/")[-1]}"'
         return response
 
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para descargar el archivo de fuentes
+    #------------------------------------------------------------
     @action(detail=True, methods=['get'])
     def download_source(self, request, pk=None):
         article = self.get_object()
@@ -62,9 +78,19 @@ class ArticleViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{article.source_file.name.split("/")[-1]}"'
         return response
     
-    @action(detail=True, methods=['delete'])
-    def delete_article(self, request, pk=None):
-        article = self.get_object()
-        article.delete()
-        return Response({'message': 'Artículo eliminado correctamente'}, status=status.HTTP_200_OK)
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para obtener articulos por id de conferencia
+    #------------------------------------------------------------
+    @action(detail=False, methods=['get'], url_path='getArticlesByConferenceId/(?P<conference_id>[^/.]+)')
+    def getArticlesByConferenceId(self, request, conference_id=None):
+        articles = Article.objects.filter(session__conference_id=conference_id)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
+    
+    # GRUPO 3 - Endpoint para obtener articulos por id de sesión
+    @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
+    def getArticlesBySessionId(self, request, session_id=None):
+        articles = Article.objects.filter(session_id=session_id)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
     
