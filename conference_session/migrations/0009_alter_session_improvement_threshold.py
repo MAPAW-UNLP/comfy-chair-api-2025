@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('conference_session', '0008_alter_session_chairs_alter_session_conference'),
+        ('conference_session', '0002_initial'),
     ]
 
     operations = [
