@@ -32,7 +32,7 @@
     POST    /api/article/
     PUT     /api/article/{articleId}/
     PATCH   /api/article/{articleId}/
-    DELETE  /api/article/{articleId}/delete_article/
+    DELETE  /api/article/{articleId}/
     GET     /api/article/{articleId}/
     GET     /api/article/{articleId}/download_main/
     GET     /api/article/{articleId}/download_source/

@@ -46,15 +46,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para la baja de un articulo
-    #------------------------------------------------------------
-    @action(detail=True, methods=['delete'])
-    def delete_article(self, request, pk=None):
-        article = self.get_object()
-        article.delete()
-        return Response({'message': 'Artículo eliminado correctamente'}, status=status.HTTP_200_OK)
-    
-    #------------------------------------------------------------
     # GRUPO 1 - Endpoint para descargar el archivo principal
     #------------------------------------------------------------
     @action(detail=True, methods=['get'])
