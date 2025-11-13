@@ -112,7 +112,7 @@ class ArticleDeletionRequestViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Solicitud rechazada'}, status=status.HTTP_200_OK)
     
     #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para saber si existe o no una solicitud de baja por ID
+    # GRUPO 1 - Endpoint para saber si existe o no una solicitud de baja por ID de articulo
     #------------------------------------------------------------
     @action(detail=False, methods=['get'], url_path='exists/(?P<article_id>[^/.]+)')
     def exists(self, request, article_id=None):
