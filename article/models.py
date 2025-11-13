@@ -2,6 +2,7 @@ from user.models import User
 from django.db import models
 from conference_session.models import Session
 
+# --- Modelo Article --- #
 class Article(models.Model):
 
     # Tipos de Articulos
@@ -37,18 +38,24 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+# --- Modelo ArticleDeletionRequest --- #
 class ArticleDeletionRequest(models.Model):
+    
+    # Estados de la Solicitud
     STATUS_CHOICES = [
         ('pending', 'Pendiente'),
         ('accepted', 'Aceptado'),
         ('rejected', 'Rechazado'),
     ]
 
-    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='deletion_requests')
+    # Atributos
     description = models.CharField(max_length=300)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Relaciones
+    article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='deletion_requests')
 
     def __str__(self):
         return f"Solicitud de eliminación - {self.article.title} ({self.status})"

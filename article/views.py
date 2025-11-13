@@ -1,15 +1,15 @@
 from rest_framework import status
-from article.models import Article, ArticleDeletionRequest
-from .serializers import ArticleSerializer, ArticleDeletionRequestSerializer
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from django.http import FileResponse, Http404
+from article.models import Article, ArticleDeletionRequest
+from .serializers import ArticleSerializer, ArticleDeletionRequestSerializer
 
+# --- Endpoints para el modelo Article ---
 class ArticleViewSet(viewsets.ModelViewSet):
-    
+
     queryset = Article.objects.all()
-    
     serializer_class = ArticleSerializer
     
     #------------------------------------------------------------
@@ -77,17 +77,22 @@ class ArticleViewSet(viewsets.ModelViewSet):
         serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
 
-    @action(detail=True, methods=['delete'])
-    def delete_article(self, request, pk=None):
-        article = self.get_object()
-        article.delete()
-        return Response({'message': 'Artículo eliminado correctamente'}, status=status.HTTP_200_OK)
+    # GRUPO 3 - Endpoint para obtener articulos por id de sesión
+    @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
+    def getArticlesBySessionId(self, request, session_id=None):
+        articles = Article.objects.filter(session_id=session_id)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
 
-
+# --- Endpoints para el modelo ArticleDeletionRequest ---
 class ArticleDeletionRequestViewSet(viewsets.ModelViewSet):
+    
     queryset = ArticleDeletionRequest.objects.all()
     serializer_class = ArticleDeletionRequestSerializer
 
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para aceptar una solicitud de baja de articulo cuando ya fue aceptado
+    #------------------------------------------------------------
     @action(detail=True, methods=['patch'])
     def accept(self, request, pk=None):
         deletion_request = self.get_object()
@@ -96,17 +101,13 @@ class ArticleDeletionRequestViewSet(viewsets.ModelViewSet):
         deletion_request.article.delete()
         return Response({'message': 'Solicitud aceptada y artículo eliminado'}, status=status.HTTP_200_OK)
 
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para rechazar una solicitud de baja de articulo cuando ya fue aceptado
+    #------------------------------------------------------------
     @action(detail=True, methods=['patch'])
     def reject(self, request, pk=None):
         deletion_request = self.get_object()
         deletion_request.status = 'rejected'
         deletion_request.save()
         return Response({'message': 'Solicitud rechazada'}, status=status.HTTP_200_OK)
-    
-    # GRUPO 3 - Endpoint para obtener articulos por id de sesión
-    @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
-    def getArticlesBySessionId(self, request, session_id=None):
-        articles = Article.objects.filter(session_id=session_id)
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
     
