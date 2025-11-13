@@ -24,13 +24,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
-    # endpoint hecho por grupo 3 para obtener articulos en base a la id de una sesion dada
-    @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
-    def getArticlesBySessionId(self, request, session_id=None):
-        articles = Article.objects.filter(session_id=session_id)
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
-    
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -63,3 +56,16 @@ class ArticleViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{article.source_file.name.split("/")[-1]}"'
         return response
     
+    # endpoint hecho por grupo 3 para obtener articulos en base al id de una sesion dada
+    @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
+    def getArticlesBySessionId(self, request, session_id=None):
+        articles = Article.objects.filter(session_id=session_id)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
+    
+    # endpoint hecho por el grupo 3 para obtener articulos en base al id de una conferencia
+    @action(detail=False, methods=['get'], url_path='getArticlesByConferenceId/(?P<conference_id>[^/.]+)')
+    def getArticlesByConferenceId(self, request, conference_id=None):
+        articles = Article.objects.filter(session__conference=conference_id)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
