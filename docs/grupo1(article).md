@@ -64,6 +64,7 @@
     Endpoints ArticleDeletionRequest:
     POST    /api/article-deletion-request/
     GET     /api/article-deletion-request/
+    GET     /api/article-deletion-request/exists/{articleId}
     GET     /api/article-deletion-request/{deletionRequestId}/
     PUT     /api/article-deletion-request/{deletionRequestId}/
     PATCH   /api/article-deletion-request/{deletionRequestId}/
