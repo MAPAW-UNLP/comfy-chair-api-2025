@@ -8,14 +8,15 @@ from user.models import User
 
     
 class Review(models.Model):
-    review_assignment = models.ForeignKey( ReviewAssignment, on_delete=models.CASCADE,related_name='reviews')
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    #review_assignment = models.ForeignKey( ReviewAssignment, on_delete=models.CASCADE,related_name='reviews')
     score = models.IntegerField(
         validators=[MinValueValidator(-3), MaxValueValidator(3)]
     )
     opinion = models.TextField()
-    #is_published = models.BooleanField(default=False)
-    #is_edited = models.BooleanField(default = False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_published = models.BooleanField(default=False) 
+    created_at = models.DateTimeField(null=True, blank=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 class ReviewVersion(models.Model):
