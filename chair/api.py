@@ -4,7 +4,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from chair.models import ReviewAssignment 
 from conference_session.models import Session
-from reviewer.models import Bid
+from reviewer.models import Bid, Review
 from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
@@ -276,3 +276,44 @@ class ScoreThresholdSelectionAPI(APIView):
         }
 
         return JsonResponse(response_data, status=200)
+
+
+class ArticleReviewsAPI(APIView):
+    """
+    Devuelve todas las revisiones recibidas por un artículo,
+    incluyendo datos del revisor.
+    """
+
+    def get(self, request, article_id):
+        # Verificar si el artículo existe
+        article = get_object_or_404(Article, id=article_id)
+
+        # Buscar las reviews asociadas
+        reviews = (
+            Review.objects
+            .filter(article=article)
+            .select_related("reviewer")    # Optimiza acceso al revisor
+        )
+
+        if not reviews.exists():
+            return JsonResponse(
+                {"message": "Este artículo no tiene revisiones aún."},
+                status=200
+            )
+
+        # Armar la respuesta
+        result = [
+            {
+                "review_id": r.id,
+                "reviewer": {
+                    "id": r.reviewer.id,
+                    "full_name": r.reviewer.full_name,
+                    "email": r.reviewer.email
+                },
+                "score": r.score,
+                "opinion": r.opinion,
+            }
+            for r in reviews
+        ]
+
+        return JsonResponse(result, safe=False, status=200)
