@@ -79,7 +79,7 @@
       "title": "International Conference on Computer Science 2025",
       "description": "A conference on cutting-edge research in AI, systems, and software engineering.",
       "start_date": "2025-08-01",
-      "end_date": "2025-08-05",
+      "end_date": "2026-08-05",
       "blind_kind": "double blind",
       "chairs": [3]
     }
@@ -90,7 +90,7 @@
     "pk": 1,
     "fields": {
       "title": "Artificial Intelligence",
-      "deadline": "2025-08-02",
+      "deadline": "2026-08-02",
       "capacity": 50,
       "conference": 1,
       "threshold_percentage": null,
@@ -103,7 +103,7 @@
     "pk": 2,
     "fields": {
       "title": "Software Engineering",
-      "deadline": "2025-08-03",
+      "deadline": "2026-08-03",
       "capacity": 40,
       "conference": 1,
       "threshold_percentage": null,

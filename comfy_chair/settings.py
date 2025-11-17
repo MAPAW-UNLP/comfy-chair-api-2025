@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'reviewer',
     'chair',
-    'review_score',
+    'notification.apps.NotificationConfig',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +58,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'user.middleware.JWTAuthenticationMiddleware'
 ]
 
 # Incluir JWTAuthenticationMiddleware solo fuera de DEBUG (producción)

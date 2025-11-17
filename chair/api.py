@@ -8,8 +8,9 @@ from reviewer.models import Bid, Review
 from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
-from review_score.models import ReviewScore
-
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.db.models import Count
 
 class ChairAPI(APIView):
     def get(self, request):
@@ -160,7 +161,7 @@ class CutoffSelectionAPI(APIView):
             )
         articles = (
             Article.objects.filter(session=session)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None)
             .order_by("-avg_score")
         )
@@ -240,7 +241,7 @@ class ScoreThresholdSelectionAPI(APIView):
         # Verificar si tiene artículos
         articles = (
             Article.objects.filter(session=session)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None)
         )
 
@@ -319,7 +320,7 @@ class ArticleReviewsAPI(APIView):
         return JsonResponse(result, safe=False, status=200)
 
 
-class ReviewedArticlesAPI(APIView):
+class ReviewedArticlesWithStatusAPI(APIView):
     """
     Devuelve la lista de artículos aceptados o rechazados de una sesión
     """
@@ -340,7 +341,7 @@ class ReviewedArticlesAPI(APIView):
 
         articles = (
             Article.objects.filter(session=session, status=status)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None) 
             .order_by('-avg_score') 
         )
@@ -356,3 +357,29 @@ class ReviewedArticlesAPI(APIView):
         ]
 
         return JsonResponse(response_data, safe=False, status=200)
+
+
+class ReviewedArticlesAPI(APIView):
+    """
+    Devuelve lista de artículos que tienen al menos una revisión publicada.
+    """
+
+    def get(self, request):
+        # Buscar artículos con reviews publicadas
+        articles = (
+            Article.objects
+            .filter(review__is_published=True)
+            .annotate(review_count=Count("review"))
+            .distinct()
+        )
+
+        result = [
+            {
+                "id": a.id,
+                "title": a.title,
+                "review_count": a.review_count,
+            }
+            for a in articles
+        ]
+
+        return Response(result, status=200)

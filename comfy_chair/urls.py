@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/', include('chair.urls')),
     #agregue esta linea para las urls de reviewer
     path('api/', include('reviewer.urls')),
-    path('api/', include('review_score.urls')),
+    path('notifications/', include('notification.urls')),
 ]
 
 # Serve media files in development
