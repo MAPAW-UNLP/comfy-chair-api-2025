@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from reviewer.models import  Review, User,Article,Bid
+from reviewer.models import  Review, User,Article,Bid, ReviewVersion
 from chair.models import ReviewAssignment
 
 
@@ -102,3 +102,9 @@ class ReviewUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['score','opinion', 'updated_at','is_published']  
+
+
+class ReviewVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReviewVersion
+        fields = ['id','review','version_number','score','opinion','created_at']

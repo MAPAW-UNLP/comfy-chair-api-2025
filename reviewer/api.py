@@ -9,7 +9,7 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 from reviewer.models import Review, Article, Bid, ReviewVersion, User
 from chair.models import ReviewAssignment
-from reviewer.serializers import ReviewUpdateSerializer, ReviewerDetailSerializer,ArticleSerializer, BidSerializer, BidUpdateSerializer,ReviewSerializer,AssignmentReviewSerializer
+from reviewer.serializers import ReviewUpdateSerializer, ReviewerDetailSerializer, BidSerializer, BidUpdateSerializer,ReviewSerializer,ReviewVersionSerializer
 
 # # GET /api/articles
 # class ArticleListView(APIView):
@@ -80,30 +80,20 @@ class ReviewerDetailView(APIView):
             )
 
 #POST /api/reviews/
-#Guarda una nueva revisión
+#Guarda una nueva revisión en borrador
 class ReviewView(APIView):
     def post(self, request):
         serializer = ReviewSerializer(data = request.data)
         if serializer.is_valid():   
-            review = serializer.save()
-            #Busca la revision(ReviewAssignment) y la marco como revisada nose si va
-            try:
-                assignment = ReviewAssignment.objects.get(
-                    reviewer=review.reviewer,                    
-                    article=review.article
-                )
-                assignment.reviewed = True
-                assignment.save()
-            except ReviewAssignment.DoesNotExist:
-                pass
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#GET /api/review/{articleId}) 
-#Devuelve la revisión de un artículo
+#GET /api/review/{articleId}/
+#Devuelve la revisión publicado o en borrador de un artículo
 class ReviewDetailView(APIView):
-    def get(self, request, articleId):
+    def get(self, articleId):
         review = Review.objects.filter(article=articleId).first()
         serializer = ReviewSerializer(review)
         if not review:
@@ -114,7 +104,33 @@ class ReviewDetailView(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 
+# GET /api/reviews/reviewer/{reviewerId}/
+#Devuelve todas las revisiones publicadas de un revisor
+class ReviewsByReviewerIdView(APIView):
+    def get(self, reviewerId):
+        reviews = Review.objects.filter(reviewer_id=reviewerId, is_published=True)
+        if not reviews.exists():
+            return Response(
+                {"message": "No se encontraron revisiones para este revisor"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = ReviewSerializer(reviews, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
    
+# GET /api/reviews/{idReview}/versions/
+#Devuelve todas las versiones de una revisión
+class ReviewVersionsView(APIView):
+    def get(self, request, idReview):
+        review = get_object_or_404(Review, id=idReview)
+        versions = ReviewVersion.objects.filter(review=review).order_by('version_number')
+        if not versions.exists():
+            return Response(
+                {"message": "No hay versiones disponibles para esta revisión"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        serializer = ReviewVersionSerializer(versions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
 #PUT /api/reviews/{idReview}/publish/
 class ReviewPublishView(APIView):
       def put(self, request, id):
