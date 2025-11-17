@@ -93,7 +93,7 @@ class ReviewView(APIView):
 #GET /api/review/{articleId}/
 #Devuelve la revisión publicado o en borrador de un artículo
 class ReviewDetailView(APIView):
-    def get(self, articleId):
+    def get(self, request, articleId):
         review = Review.objects.filter(article=articleId).first()
         serializer = ReviewSerializer(review)
         if not review:
@@ -107,7 +107,7 @@ class ReviewDetailView(APIView):
 # GET /api/reviews/reviewer/{reviewerId}/
 #Devuelve todas las revisiones publicadas de un revisor
 class ReviewsByReviewerIdView(APIView):
-    def get(self, reviewerId):
+    def get(self, request, reviewerId):
         reviews = Review.objects.filter(reviewer_id=reviewerId, is_published=True)
         if not reviews.exists():
             return Response(
