@@ -8,7 +8,6 @@ from reviewer.models import Bid, Review
 from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
-from review_score.models import ReviewScore
 
 
 class ChairAPI(APIView):
@@ -160,7 +159,7 @@ class CutoffSelectionAPI(APIView):
             )
         articles = (
             Article.objects.filter(session=session)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None)
             .order_by("-avg_score")
         )
@@ -240,7 +239,7 @@ class ScoreThresholdSelectionAPI(APIView):
         # Verificar si tiene artículos
         articles = (
             Article.objects.filter(session=session)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None)
         )
 
