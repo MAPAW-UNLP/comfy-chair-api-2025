@@ -317,3 +317,42 @@ class ArticleReviewsAPI(APIView):
         ]
 
         return JsonResponse(result, safe=False, status=200)
+
+
+class ReviewedArticlesAPI(APIView):
+    """
+    Devuelve la lista de artículos aceptados o rechazados de una sesión
+    """
+    def get(self, request, session_id):
+        # Captura el parámetro status de la URL (ej: ?status=accepted)
+        status = request.query_params.get('status') 
+        
+        if status not in ['accepted', 'rejected']:
+            return JsonResponse(
+                {"error": "El parámetro status debe ser 'accepted' o 'rejected'."}, 
+                status=400
+            )
+
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
+
+        articles = (
+            Article.objects.filter(session=session, status=status)
+            .annotate(avg_score=Avg("review_scores__score"))
+            .exclude(avg_score=None) 
+            .order_by('-avg_score') 
+        )
+
+        response_data = [
+            {
+                "id": a.id,
+                "title": a.title,
+                "avg_score": a.avg_score, 
+                "status": a.status,
+            }
+            for a in articles
+        ]
+
+        return JsonResponse(response_data, safe=False, status=200)
