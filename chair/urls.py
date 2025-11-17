@@ -5,7 +5,8 @@ from .api import (
     AvailableReviewersAPI,
     CutoffSelectionAPI,
     ScoreThresholdSelectionAPI,
-    ArticleReviewsAPI
+    ArticleReviewsAPI,
+    ReviewedArticlesAPI,
 )
 
 urlpatterns = [
@@ -15,5 +16,5 @@ urlpatterns = [
     path("selection/cut-off/<int:session_id>/", CutoffSelectionAPI.as_view(), name="selection-cut-off"),
     path("selection/score-threshold/<int:session_id>/", ScoreThresholdSelectionAPI.as_view(), name="selection-score-threshold"),
     path('chair/articles/<int:article_id>/reviews/',ArticleReviewsAPI.as_view(),name='article-reviews'),
-
+    path('chair/articles-reviewed/',ReviewedArticlesAPI.as_view(),name='article-with-reviews'),
 ]
