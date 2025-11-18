@@ -81,18 +81,18 @@ class AvailableReviewersAPI(APIView):
                 'id': bid.reviewer.id,
                 'full_name': bid.reviewer.full_name,
                 'email': bid.reviewer.email,
-                'interest': bid.interest,
+                'interest': bid.choice,
                 'assigned': ReviewAssignment.objects.filter(
                     article=article,
                     reviewer=bid.reviewer,
                     deleted=False
                 ).exists(),
             }
-            if bid.interest == 'interested':
+            if bid.choice == 'interested':
                 interested.append(reviewer_data)
-            elif bid.interest == 'maybe':
+            elif bid.choice == 'maybe':
                 maybe.append(reviewer_data)
-            elif bid.interest == 'not_interested':
+            elif bid.choice == 'not_interested':
                 not_interested.append(reviewer_data)
 
         reviewers_without_bid = User.objects.filter(role = "user").exclude(id__in=reviewers_with_bid_ids)
@@ -363,15 +363,18 @@ class ReviewedArticlesAPI(APIView):
     """
     Devuelve lista de artículos que tienen al menos una revisión publicada.
     """
-
     def get(self, request):
-        # Buscar artículos con reviews publicadas
+        session_id = request.query_params.get("session_id")
+
         articles = (
             Article.objects
             .filter(review__is_published=True)
             .annotate(review_count=Count("review"))
             .distinct()
         )
+
+        if session_id:
+            articles = articles.filter(session_id=session_id)
 
         result = [
             {
