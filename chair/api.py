@@ -278,7 +278,6 @@ class ScoreThresholdSelectionAPI(APIView):
 
         return JsonResponse(response_data, status=200)
 
-
 class ArticleReviewsAPI(APIView):
     """
     Devuelve todas las revisiones recibidas por un artículo,
@@ -293,16 +292,18 @@ class ArticleReviewsAPI(APIView):
         reviews = (
             Review.objects
             .filter(article=article)
-            .select_related("reviewer")    # Optimiza acceso al revisor
+            .select_related("reviewer")
         )
 
         if not reviews.exists():
             return JsonResponse(
-                {"message": "Este artículo no tiene revisiones aún."},
+                {
+                    "article_title": article.title,
+                    "message": "Este artículo no tiene revisiones aún."
+                },
                 status=200
             )
 
-        # Armar la respuesta
         result = [
             {
                 "review_id": r.id,
@@ -317,7 +318,14 @@ class ArticleReviewsAPI(APIView):
             for r in reviews
         ]
 
-        return JsonResponse(result, safe=False, status=200)
+        return JsonResponse(
+            {
+                "article_title": article.title,
+                "reviews": result
+            },
+            status=200
+        )
+
 
 
 class ReviewedArticlesWithStatusAPI(APIView):
