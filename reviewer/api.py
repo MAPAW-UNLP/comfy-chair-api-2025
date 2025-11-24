@@ -95,12 +95,12 @@ class ReviewView(APIView):
 class ReviewDetailView(APIView):
     def get(self, request, articleId):
         review = Review.objects.filter(article=articleId).first()
-        serializer = ReviewSerializer(review)
         if not review:
             return Response(
                {"message":"No existe una revision de ese articulo"},
                status = status.HTTP_404_NOT_FOUND
            )
+        serializer = ReviewSerializer(review)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 
