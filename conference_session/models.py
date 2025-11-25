@@ -43,6 +43,24 @@ class Session(models.Model):
         blank=True,
         related_name='session'
     )
+    locked_selection = models.BooleanField(
+        default=False,
+        blank=True,
+        help_text="If true, the selection type cannot be modified."
+    )
+
+    TYPE_SELECTION_CHOICES = [
+        ("ScoreThresholdSelection", "ScoreThresholdSelection"),
+        ("CutoffSelection", "CutoffSelection"),
+    ]
+
+    type_selection = models.CharField(
+        max_length=50,
+        choices=TYPE_SELECTION_CHOICES,
+        null=True,      # OPCIONAL
+        blank=True,     # OPCIONAL
+        help_text="Type of selection used for this session."
+    )
 
     def __str__(self):
         return f"{self.title} ({self.conference.title})"
