@@ -195,6 +195,10 @@ class CutoffSelectionAPI(APIView):
                 {"id": a.id, "title": a.title, "avg_score": a.avg_score} for a in rejected_articles
             ],
         }
+
+        session.type_selection = "CutoffSelection"
+        session.threshold_percentage = percentage
+        session.save()
         return JsonResponse(response_data, status=200)
     
 
@@ -276,6 +280,9 @@ class ScoreThresholdSelectionAPI(APIView):
             ],
         }
 
+        session.type_selection = "ScoreThresholdSelection"
+        session.improvement_threshold = cutoff_score
+        session.save()
         return JsonResponse(response_data, status=200)
 
 class ArticleReviewsAPI(APIView):
