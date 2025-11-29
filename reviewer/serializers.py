@@ -64,7 +64,7 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
         # Devolver información estructurada de las asignaciones para que el
         # frontend tenga access al `id` y al `title` (evita NaN/undefined)
         assigned_articles = ReviewAssignment.objects.filter(
-            reviewer=obj
+            reviewer=obj, deleted=False
         ).select_related('article')
 
         # Reutilizamos el serializer local `AssignmentReviewSerializer` que
