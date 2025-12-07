@@ -1,11 +1,13 @@
-from rest_framework import serializers
-from conference_session.models import Session
-from conference_session.serializers import SessionSerializer
 from user.models import User
+from rest_framework import serializers
 from user.serializers import UserSerializer
-from .models import Article
+from conference_session.models import Session
+from .models import Article, ArticleDeletionRequest
+from conference_session.serializers import SessionSerializer
 
+# --- Serializer para Article ---
 class ArticleSerializer(serializers.ModelSerializer):
+
     # Lectura
     session = SessionSerializer(read_only=True)
     authors = UserSerializer(many=True, read_only=True)
@@ -31,3 +33,22 @@ class ArticleSerializer(serializers.ModelSerializer):
             'authors_ids', 'corresponding_author_id',
             'session', 'session_id'
         ]
+
+# --- Serializer para ArticleDeletionRequest ---
+class ArticleDeletionRequestSerializer(serializers.ModelSerializer):
+    
+    # Lectura
+    article = ArticleSerializer(read_only=True)
+    
+    # Escritura
+    article_id = serializers.PrimaryKeyRelatedField(
+        queryset=Article.objects.all(), source='article', write_only=True
+    )
+
+    class Meta:
+        model = ArticleDeletionRequest
+        fields = [
+            'id', 'article', 'article_id', 'description', 
+            'status', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['created_at', 'updated_at']
