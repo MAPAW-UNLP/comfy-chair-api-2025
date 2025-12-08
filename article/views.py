@@ -1,17 +1,20 @@
-from rest_framework import viewsets
-from rest_framework.response import Response
 from rest_framework import status
-from article.models import Article
-from .serializers import ArticleSerializer
-from django.http import FileResponse, Http404
-from rest_framework.decorators import action
 from rest_framework import viewsets, status
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from django.http import FileResponse, Http404
+from article.models import Article, ArticleDeletionRequest
+from .serializers import ArticleSerializer, ArticleDeletionRequestSerializer
 
+# --- Endpoints para el modelo Article ---
 class ArticleViewSet(viewsets.ModelViewSet):
-    queryset = Article.objects.all()
 
+    queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para el alta de un articulo
+    #------------------------------------------------------------
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
@@ -38,6 +41,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         self.perform_update(serializer)
         return Response(serializer.data)
     
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para descargar el archivo principal
+    #------------------------------------------------------------
     @action(detail=True, methods=['get'])
     def download_main(self, request, pk=None):
         article = self.get_object()
@@ -47,6 +53,9 @@ class ArticleViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{article.main_file.name.split("/")[-1]}"'
         return response
 
+    #------------------------------------------------------------
+    # GRUPO 1 - Endpoint para descargar el archivo de fuentes
+    #------------------------------------------------------------
     @action(detail=True, methods=['get'])
     def download_source(self, request, pk=None):
         article = self.get_object()
