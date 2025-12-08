@@ -27,9 +27,6 @@ class ArticleViewSet(viewsets.ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
-    #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para la modificación de un articulo
-    #------------------------------------------------------------
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
@@ -68,53 +65,16 @@ class ArticleViewSet(viewsets.ModelViewSet):
         response['Content-Disposition'] = f'attachment; filename="{article.source_file.name.split("/")[-1]}"'
         return response
     
-    #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para obtener articulos por id de conferencia
-    #------------------------------------------------------------
-    @action(detail=False, methods=['get'], url_path='getArticlesByConferenceId/(?P<conference_id>[^/.]+)')
-    def getArticlesByConferenceId(self, request, conference_id=None):
-        articles = Article.objects.filter(session__conference_id=conference_id)
-        serializer = ArticleSerializer(articles, many=True)
-        return Response(serializer.data)
-
-    # GRUPO 3 - Endpoint para obtener articulos por id de sesión
+    # endpoint hecho por grupo 3 para obtener articulos en base al id de una sesion dada
     @action(detail=False, methods=['get'], url_path='getArticlesBySessionId/(?P<session_id>[^/.]+)')
     def getArticlesBySessionId(self, request, session_id=None):
         articles = Article.objects.filter(session_id=session_id)
         serializer = ArticleSerializer(articles, many=True)
         return Response(serializer.data)
-
-# --- Endpoints para el modelo ArticleDeletionRequest ---
-class ArticleDeletionRequestViewSet(viewsets.ModelViewSet):
     
-    queryset = ArticleDeletionRequest.objects.all()
-    serializer_class = ArticleDeletionRequestSerializer
-
-    #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para aceptar una solicitud de baja de articulo cuando ya fue aceptado
-    #------------------------------------------------------------
-    @action(detail=True, methods=['patch'])
-    def accept(self, request, pk=None):
-        deletion_request = self.get_object()
-        deletion_request.status = 'accepted'
-        deletion_request.save()
-        deletion_request.article.delete()
-        return Response({'message': 'Solicitud aceptada y artículo eliminado'}, status=status.HTTP_200_OK)
-
-    #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para rechazar una solicitud de baja de articulo cuando ya fue aceptado
-    #------------------------------------------------------------
-    @action(detail=True, methods=['patch'])
-    def reject(self, request, pk=None):
-        deletion_request = self.get_object()
-        deletion_request.status = 'rejected'
-        deletion_request.save()
-        return Response({'message': 'Solicitud rechazada'}, status=status.HTTP_200_OK)
-    
-    #------------------------------------------------------------
-    # GRUPO 1 - Endpoint para saber si existe o no una solicitud de baja por ID de articulo
-    #------------------------------------------------------------
-    @action(detail=False, methods=['get'], url_path='exists/(?P<article_id>[^/.]+)')
-    def exists(self, request, article_id=None):
-        exists = ArticleDeletionRequest.objects.filter(article_id=article_id).exists()
-        return Response({'exists': exists})
+    # endpoint hecho por el grupo 3 para obtener articulos en base al id de una conferencia
+    @action(detail=False, methods=['get'], url_path='getArticlesByConferenceId/(?P<conference_id>[^/.]+)')
+    def getArticlesByConferenceId(self, request, conference_id=None):
+        articles = Article.objects.filter(session__conference=conference_id)
+        serializer = ArticleSerializer(articles, many=True)
+        return Response(serializer.data)
