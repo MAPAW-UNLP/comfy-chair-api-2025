@@ -1,7 +1,9 @@
 from rest_framework.routers import DefaultRouter
-from .views import ArticleViewSet
+from .views import ArticleViewSet, ArticleDeletionRequestViewSet
 
 router = DefaultRouter()
+
 router.register(r'article', ArticleViewSet, basename='article')
+router.register(r'article-deletion-request', ArticleDeletionRequestViewSet, basename='article-deletion-request')
 
 urlpatterns = router.urls

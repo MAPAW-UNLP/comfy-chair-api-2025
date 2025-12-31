@@ -1,6 +1,6 @@
 
 from rest_framework import serializers
-from reviewer.models import  Review, User,Article,Bid
+from reviewer.models import  Review, User,Article,Bid, ReviewVersion
 from chair.models import ReviewAssignment
 
 
@@ -64,7 +64,7 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
         # Devolver información estructurada de las asignaciones para que el
         # frontend tenga access al `id` y al `title` (evita NaN/undefined)
         assigned_articles = ReviewAssignment.objects.filter(
-            reviewer=obj
+            reviewer=obj, deleted=False
         ).select_related('article')
 
         # Reutilizamos el serializer local `AssignmentReviewSerializer` que
@@ -87,15 +87,24 @@ class ReviewerDetailSerializer(serializers.ModelSerializer):
 
     def get_reviews_count(self, obj):
         """Cuenta cuántas revisiones ha completado el revisor"""
-        return Review.objects.filter(reviewer=obj).count()
+        return ReviewAssignment.objects.filter(
+            reviewer=obj,
+            reviewed=True,  # Solo las completadas
+        ).count()
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['id','reviewer','article','score','opinion','is_published']
+        fields = ['id','score','opinion','created_at','updated_at','reviewer','article','is_published']
 
 class ReviewUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = ['score','opinion', 'is_published','is_edited' ]  
+        fields = ['score','opinion', 'updated_at','is_published']  
+
+
+class ReviewVersionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ReviewVersion
+        fields = ['id','review','version_number','score','opinion','created_at']

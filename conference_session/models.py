@@ -28,7 +28,7 @@ class Session(models.Model):
         blank=True,
         default=None
     )
-    improvement_threshold = models.IntegerField(
+    improvement_threshold = models.FloatField(
         validators=[
             MinValueValidator(-3),
             MaxValueValidator(3)
