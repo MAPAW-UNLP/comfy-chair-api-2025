@@ -214,78 +214,84 @@
     }
   },
 
-  {
-    "model": "reviewer.review",
-    "pk": 1,
-    "fields": {
-      "reviewer": 4,
-      "article": 1,
-      "score": 2,
-      "opinion": "Strong paper, but needs clearer experimental details.",
-      "is_published": true,
-      "is_edited": false
-    }
-  },
-  {
-    "model": "reviewer.review",
-    "pk": 2,
-    "fields": {
-      "reviewer": 5,
-      "article": 1,
-      "score": 1,
-      "opinion": "Interesting idea, but several weaknesses.",
-      "is_published": true,
-      "is_edited": false
-    }
-  },
-  {
-    "model": "reviewer.review",
-    "pk": 3,
-    "fields": {
-      "reviewer": 6,
-      "article": 2,
-      "score": 3,
-      "opinion": "Excellent contribution to the field.",
-      "is_published": true,
-      "is_edited": false
-    }
-  },
-  {
-    "model": "reviewer.review",
-    "pk": 4,
-    "fields": {
-      "reviewer": 4,
-      "article": 4,
-      "score": -1,
-      "opinion": "Promising but lacks empirical validation.",
-      "is_published": true,
-      "is_edited": false
-    }
-  },
-  {
-    "model": "reviewer.review",
-    "pk": 5,
-    "fields": {
-      "reviewer": 1,
-      "article": 3,
-      "score": 2,
-      "opinion": "Good structure and clarity.",
-      "is_published": true,
-      "is_edited": false
-    }
-  },
-  {
-    "model": "reviewer.review",
-    "pk": 6,
-    "fields": {
-      "reviewer": 5,
-      "article": 3,
-      "score": 0,
-      "opinion": "Average, could be improved.",
-      "is_published": true,
-      "is_edited": false
-    }
-  },
+{
+  "model": "reviewer.review",
+  "pk": 1,
+  "fields": {
+    "reviewer": 4,
+    "article": 1,
+    "score": 2,
+    "opinion": "Strong paper, but needs clearer experimental details.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 2,
+  "fields": {
+    "reviewer": 5,
+    "article": 1,
+    "score": 1,
+    "opinion": "Interesting idea, but several weaknesses.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 3,
+  "fields": {
+    "reviewer": 6,
+    "article": 2,
+    "score": 3,
+    "opinion": "Excellent contribution to the field.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 4,
+  "fields": {
+    "reviewer": 4,
+    "article": 4,
+    "score": -1,
+    "opinion": "Promising but lacks empirical validation.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 5,
+  "fields": {
+    "reviewer": 1,
+    "article": 3,
+    "score": 2,
+    "opinion": "Good structure and clarity.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 6,
+  "fields": {
+    "reviewer": 5,
+    "article": 3,
+    "score": 0,
+    "opinion": "Average, could be improved.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
 
   {
     "model": "reviewer.bid",
