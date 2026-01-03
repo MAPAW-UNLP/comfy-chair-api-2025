@@ -4,12 +4,13 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from chair.models import ReviewAssignment 
 from conference_session.models import Session
-from reviewer.models import Bid
+from reviewer.models import Bid, Review
 from chair.serializers import ReviewAssignmentSerializer
 from article.models import Article
 from user.models import User
-from review_score.models import ReviewScore
-
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.db.models import Count
 
 class ChairAPI(APIView):
     def get(self, request):
@@ -80,18 +81,18 @@ class AvailableReviewersAPI(APIView):
                 'id': bid.reviewer.id,
                 'full_name': bid.reviewer.full_name,
                 'email': bid.reviewer.email,
-                'interest': bid.interest,
+                'interest': bid.choice,
                 'assigned': ReviewAssignment.objects.filter(
                     article=article,
                     reviewer=bid.reviewer,
                     deleted=False
                 ).exists(),
             }
-            if bid.interest == 'interested':
+            if bid.choice == 'interested':
                 interested.append(reviewer_data)
-            elif bid.interest == 'maybe':
+            elif bid.choice == 'maybe':
                 maybe.append(reviewer_data)
-            elif bid.interest == 'not_interested':
+            elif bid.choice == 'not_interested':
                 not_interested.append(reviewer_data)
 
         reviewers_without_bid = User.objects.filter(role = "user").exclude(id__in=reviewers_with_bid_ids)
@@ -160,7 +161,7 @@ class CutoffSelectionAPI(APIView):
             )
         articles = (
             Article.objects.filter(session=session)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None)
             .order_by("-avg_score")
         )
@@ -194,6 +195,10 @@ class CutoffSelectionAPI(APIView):
                 {"id": a.id, "title": a.title, "avg_score": a.avg_score} for a in rejected_articles
             ],
         }
+
+        session.type_selection = "CutoffSelection"
+        session.threshold_percentage = percentage
+        session.save()
         return JsonResponse(response_data, status=200)
     
 
@@ -240,7 +245,7 @@ class ScoreThresholdSelectionAPI(APIView):
         # Verificar si tiene artículos
         articles = (
             Article.objects.filter(session=session)
-            .annotate(avg_score=Avg("review_scores__score"))
+            .annotate(avg_score=Avg("review__score"))
             .exclude(avg_score=None)
         )
 
@@ -275,4 +280,124 @@ class ScoreThresholdSelectionAPI(APIView):
             ],
         }
 
+        session.type_selection = "ScoreThresholdSelection"
+        session.improvement_threshold = cutoff_score
+        session.save()
         return JsonResponse(response_data, status=200)
+
+class ArticleReviewsAPI(APIView):
+    """
+    Devuelve todas las revisiones recibidas por un artículo,
+    incluyendo datos del revisor.
+    """
+
+    def get(self, request, article_id):
+        # Verificar si el artículo existe
+        article = get_object_or_404(Article, id=article_id)
+
+        # Buscar las reviews asociadas
+        reviews = (
+            Review.objects
+            .filter(article=article)
+            .select_related("reviewer")
+        )
+
+        if not reviews.exists():
+            return JsonResponse(
+                {
+                    "article_title": article.title,
+                    "message": "Este artículo no tiene revisiones aún."
+                },
+                status=200
+            )
+
+        result = [
+            {
+                "review_id": r.id,
+                "reviewer": {
+                    "id": r.reviewer.id,
+                    "full_name": r.reviewer.full_name,
+                    "email": r.reviewer.email
+                },
+                "score": r.score,
+                "opinion": r.opinion,
+            }
+            for r in reviews
+        ]
+
+        return JsonResponse(
+            {
+                "article_title": article.title,
+                "reviews": result
+            },
+            status=200
+        )
+
+
+
+class ReviewedArticlesWithStatusAPI(APIView):
+    """
+    Devuelve la lista de artículos aceptados o rechazados de una sesión
+    """
+    def get(self, request, session_id):
+        # Captura el parámetro status de la URL (ej: ?status=accepted)
+        status = request.query_params.get('status') 
+        
+        if status not in ['accepted', 'rejected']:
+            return JsonResponse(
+                {"error": "El parámetro status debe ser 'accepted' o 'rejected'."}, 
+                status=400
+            )
+
+        try:
+            session = Session.objects.get(id=session_id)
+        except Session.DoesNotExist:
+            return JsonResponse({'error': 'Sesión no encontrada'}, status=404)
+
+        articles = (
+            Article.objects.filter(session=session, status=status)
+            .annotate(avg_score=Avg("review__score"))
+            .exclude(avg_score=None) 
+            .order_by('-avg_score') 
+        )
+
+        response_data = [
+            {
+                "id": a.id,
+                "title": a.title,
+                "avg_score": a.avg_score, 
+                "status": a.status,
+            }
+            for a in articles
+        ]
+
+        return JsonResponse(response_data, safe=False, status=200)
+
+
+class ReviewedArticlesAPI(APIView):
+    """
+    Devuelve lista de artículos que tienen al menos una revisión publicada.
+    """
+    def get(self, request):
+        session_id = request.query_params.get("session_id")
+
+        articles = (
+            Article.objects
+            .filter(review__is_published=True)
+            .annotate(review_count=Count("review"))
+            .distinct()
+        )
+
+        if session_id:
+            articles = articles.filter(session_id=session_id)
+
+        result = [
+            {
+                "id": a.id,
+                "title": a.title,
+                "review_count": a.review_count,
+            }
+            for a in articles
+        ]
+
+        return Response(result, status=200)

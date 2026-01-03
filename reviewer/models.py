@@ -19,7 +19,7 @@ class Review(BaseReview):
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     is_published = models.BooleanField(default=False) 
     created_at = models.DateTimeField(null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now =True)
 
 class ReviewVersion(BaseReview):
     review = models.ForeignKey(Review, on_delete=models.CASCADE,related_name='versions')

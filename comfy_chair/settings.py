@@ -48,7 +48,6 @@ INSTALLED_APPS = [
     'reviewer',
     'chair',
     'notification.apps.NotificationConfig',
-    'review_score',
 ]
 
 MIDDLEWARE = [

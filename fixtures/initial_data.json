@@ -1,0 +1,350 @@
+[
+  {
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$sofia$5HNsirylNbZwkoZXHpRCQbvTMZAQnxFlZpYlk0koVNE=",
+      "full_name": "Alice Johnson",
+      "affiliation": "MIT",
+      "email": "alice@mit.edu",
+      "role": "user",
+      "deleted": false
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$sofia$5HNsirylNbZwkoZXHpRCQbvTMZAQnxFlZpYlk0koVNE=",
+      "full_name": "Bob Martínez",
+      "affiliation": "Stanford University",
+      "email": "bob@stanford.edu",
+      "role": "user",
+      "deleted": false
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$sofia$5HNsirylNbZwkoZXHpRCQbvTMZAQnxFlZpYlk0koVNE=",
+      "full_name": "Clara Fernández",
+      "affiliation": "Universidad de La Plata",
+      "email": "clara@unlp.edu.ar",
+      "role": "admin",
+      "deleted": false
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$sofia$5HNsirylNbZwkoZXHpRCQbvTMZAQnxFlZpYlk0koVNE=",
+      "full_name": "David Chen",
+      "affiliation": "Harvard University",
+      "email": "david@harvard.edu",
+      "role": "user",
+      "deleted": false
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$sofia$5HNsirylNbZwkoZXHpRCQbvTMZAQnxFlZpYlk0koVNE=",
+      "full_name": "Elena Rossi",
+      "affiliation": "Politecnico di Milano",
+      "email": "elena@polimi.it",
+      "role": "user",
+      "deleted": false
+    }
+  },
+  {
+    "model": "user.user",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$sofia$5HNsirylNbZwkoZXHpRCQbvTMZAQnxFlZpYlk0koVNE=",
+      "full_name": "Frank Müller",
+      "affiliation": "TU Munich",
+      "email": "frank@tum.de",
+      "role": "user",
+      "deleted": false
+    }
+  },
+
+  {
+    "model": "conference.conference",
+    "pk": 1,
+    "fields": {
+      "title": "International Conference on Computer Science 2025",
+      "description": "A conference on cutting-edge research in AI, systems, and software engineering.",
+      "start_date": "2025-08-01",
+      "end_date": "2026-08-05",
+      "blind_kind": "double blind",
+      "chairs": [3]
+    }
+  },
+
+  {
+    "model": "conference_session.session",
+    "pk": 1,
+    "fields": {
+      "title": "Artificial Intelligence",
+      "deadline": "2026-08-02",
+      "capacity": 50,
+      "conference": 1,
+      "threshold_percentage": null,
+      "improvement_threshold": null,
+      "chairs": [3]
+    }
+  },
+  {
+    "model": "conference_session.session",
+    "pk": 2,
+    "fields": {
+      "title": "Software Engineering",
+      "deadline": "2026-08-03",
+      "capacity": 40,
+      "conference": 1,
+      "threshold_percentage": null,
+      "improvement_threshold": null,
+      "chairs": [3]
+    }
+  },
+
+  {
+    "model": "article.article",
+    "pk": 1,
+    "fields": {
+      "title": "Deep Learning Approaches for Natural Language Processing",
+      "main_file": "articles/nlp.pdf",
+      "status": "review",
+      "type": "regular",
+      "abstract": "We explore transformer architectures and optimization methods applied to NLP.",
+      "source_file": null,
+      "corresponding_author": 1,
+      "session": 1,
+      "authors": [1, 2]
+    }
+  },
+  {
+    "model": "article.article",
+    "pk": 2,
+    "fields": {
+      "title": "Optimizing Distributed Systems with Adaptive Load Balancing",
+      "main_file": "articles/systems.pdf",
+      "status": "review",
+      "type": "regular",
+      "abstract": "New strategies for real-time monitoring and performance tuning in distributed systems.",
+      "source_file": null,
+      "corresponding_author": 2,
+      "session": 2,
+      "authors": [2, 3]
+    }
+  },
+  {
+    "model": "article.article",
+    "pk": 3,
+    "fields": {
+      "title": "Secure Authentication Protocols for IoT Devices",
+      "main_file": "articles/iot.pdf",
+      "status": "review",
+      "type": "poster",
+      "abstract": "We present a lightweight authentication protocol for constrained IoT environments.",
+      "source_file": "articles/sources/iot-src.zip",
+      "corresponding_author": 5,
+      "session": 2,
+      "authors": [5, 6]
+    }
+  },
+  {
+    "model": "article.article",
+    "pk": 4,
+    "fields": {
+      "title": "Quantum Computing Algorithms for Cryptanalysis",
+      "main_file": "articles/quantum.pdf",
+      "status": "review",
+      "type": "regular",
+      "abstract": "An exploration of Shor-based cryptanalysis optimized for near-term quantum hardware.",
+      "source_file": null,
+      "corresponding_author": 4,
+      "session": 1,
+      "authors": [4, 1]
+    }
+  },
+
+  {
+    "model": "chair.reviewassignment",
+    "pk": 1,
+    "fields": {
+      "reviewer": 4,
+      "article": 1,
+      "reviewed": false,
+      "deleted": false
+    }
+  },
+  {
+    "model": "chair.reviewassignment",
+    "pk": 2,
+    "fields": {
+      "reviewer": 5,
+      "article": 1,
+      "reviewed": false,
+      "deleted": false
+    }
+  },
+  {
+    "model": "chair.reviewassignment",
+    "pk": 3,
+    "fields": {
+      "reviewer": 6,
+      "article": 2,
+      "reviewed": false,
+      "deleted": false
+    }
+  },
+  {
+    "model": "chair.reviewassignment",
+    "pk": 4,
+    "fields": {
+      "reviewer": 4,
+      "article": 4,
+      "reviewed": false,
+      "deleted": false
+    }
+  },
+
+{
+  "model": "reviewer.review",
+  "pk": 1,
+  "fields": {
+    "reviewer": 4,
+    "article": 1,
+    "score": 2,
+    "opinion": "Strong paper, but needs clearer experimental details.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 2,
+  "fields": {
+    "reviewer": 5,
+    "article": 1,
+    "score": 1,
+    "opinion": "Interesting idea, but several weaknesses.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 3,
+  "fields": {
+    "reviewer": 6,
+    "article": 2,
+    "score": 3,
+    "opinion": "Excellent contribution to the field.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 4,
+  "fields": {
+    "reviewer": 4,
+    "article": 4,
+    "score": -1,
+    "opinion": "Promising but lacks empirical validation.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 5,
+  "fields": {
+    "reviewer": 1,
+    "article": 3,
+    "score": 2,
+    "opinion": "Good structure and clarity.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+{
+  "model": "reviewer.review",
+  "pk": 6,
+  "fields": {
+    "reviewer": 5,
+    "article": 3,
+    "score": 0,
+    "opinion": "Average, could be improved.",
+    "is_published": true,
+    "created_at": "2025-01-01T10:00:00Z",
+    "updated_at": "2025-01-01T10:00:00Z"
+  }
+},
+
+  {
+    "model": "reviewer.bid",
+    "pk": 1,
+    "fields": {
+      "reviewer": 4,
+      "article": 1,
+      "choice": "Interesado"
+    }
+  },
+  {
+    "model": "reviewer.bid",
+    "pk": 2,
+    "fields": {
+      "reviewer": 5,
+      "article": 1,
+      "choice": "Quizás"
+    }
+  },
+  {
+    "model": "reviewer.bid",
+    "pk": 3,
+    "fields": {
+      "reviewer": 6,
+      "article": 2,
+      "choice": "Interesado"
+    }
+  },
+  {
+    "model": "reviewer.bid",
+    "pk": 4,
+    "fields": {
+      "reviewer": 1,
+      "article": 3,
+      "choice": "No Interesado"
+    }
+  },
+  {
+    "model": "reviewer.bid",
+    "pk": 5,
+    "fields": {
+      "reviewer": 5,
+      "article": 3,
+      "choice": "Interesado"
+    }
+  },
+  {
+    "model": "reviewer.bid",
+    "pk": 6,
+    "fields": {
+      "reviewer": 4,
+      "article": 4,
+      "choice": "Quizás"
+    }
+  }
+]
